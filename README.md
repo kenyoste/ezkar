@@ -51,7 +51,7 @@ ezkar/
 ├── sw.js                   # Service Worker dosyası
 ├── robots.txt              # Arama motorları için yönlendirme
 ├── sitemap.xml             # Site haritası
-├── logo.png                # Uygulama logosu
+├── logo.webp                # Uygulama logosu
 ├── README.md               # Proje dokümantasyonu
 └── src/
     ├── fonts/

@@ -3,12 +3,40 @@
 let showTranslation = false;
 let darkMode = false;
 
-function showZikir(type) {
+function showZikir(type, buttonElement = null) {
+    // Loading göster
+    showLoading();
+    
     // Butonları güncelle
-    document.querySelectorAll('.tab-button').forEach(btn => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach((btn, index) => {
         btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        
+        // ARIA güncellemesi
+        if (buttonElement === btn || 
+            (type === 'sabah' && btn.id === 'sabah-tab') ||
+            (type === 'aksam' && btn.id === 'aksam-tab')) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+        }
     });
-    event.target.classList.add('active');
+    
+    // Eğer button elementi verilmişse onu aktif yap
+    if (buttonElement) {
+        buttonElement.classList.add('active');
+        buttonElement.setAttribute('aria-selected', 'true');
+    } else {
+        // Aksi halde type'a göre ilgili butonu bul ve aktif yap
+        tabButtons.forEach(btn => {
+            const btnText = btn.textContent.trim();
+            if ((type === 'sabah' && btnText.includes('Sabah')) || 
+                (type === 'aksam' && btnText.includes('Akşam'))) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+            }
+        });
+    }
 
     // İçerikleri güncelle
     document.getElementById('sabah-content').classList.remove('active');
@@ -19,7 +47,15 @@ function showZikir(type) {
     renderZikirler(type);
     
     // Progress'i güncelle
-    setTimeout(updateScrollProgress, 100);
+    setTimeout(() => {
+        updateScrollProgress();
+        hideLoading();
+        const content = document.getElementById(type + '-content');
+        if (content) {
+            content.focus();
+            announceToScreenReader(`${type === 'sabah' ? 'Sabah' : 'Akşam'} zikirleri yüklendi`);
+        }
+    }, 100);
 }
 
 function renderZikirler(type) {
@@ -57,16 +93,16 @@ function renderZikirler(type) {
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         };
         return `
-            <div class="zikir-item" data-zikir-id="${zikirId}" 
+            <article class="zikir-item" data-zikir-id="${zikirId}" 
                  data-title="${escapeHtml(zikir.title)}"
                  data-arabic="${escapeHtml(zikir.arabic)}"
                  data-translation="${escapeHtml(zikir.translation)}"
                  data-count="${escapeHtml(zikir.count)}"
                  data-footnote="${zikir.footnote ? escapeHtml(zikir.footnote) : ''}">
-                <button class="copy-btn-item" onclick="copyZikirFromElement(this)" title="Kopyala">
+                <button class="copy-btn-item" onclick="copyZikirFromElement(this)" title="Kopyala" aria-label="Zikri kopyala">
                     <i class="fas fa-copy"></i>
                 </button>
-                ${showTitle ? `<div class="zikir-title">${zikir.title}</div>` : ''}
+                ${showTitle ? `<h2 class="zikir-title">${zikir.title}</h2>` : ''}
                 <div class="zikir-arabic">${zikir.arabic}</div>
                 <div class="zikir-tags-container">
                     <div class="zikir-count">${zikir.count}</div>
@@ -79,7 +115,7 @@ function renderZikirler(type) {
                 <div class="zikir-translation ${showTranslation ? '' : 'hidden'}">
                     ${zikir.translation}
                 </div>
-            </div>
+            </article>
         `;
     }).join('');
     
@@ -173,6 +209,8 @@ function copyZikirFromElement(button) {
             
             // "Kopyalandı" tooltip'i göster
             showCopyTooltip(button);
+            showSuccess('Zikir kopyalandı');
+            announceToScreenReader('Zikir panoya kopyalandı');
             
             setTimeout(() => {
                 icon.className = originalClass;
@@ -181,7 +219,7 @@ function copyZikirFromElement(button) {
             }, 2000);
         }
     }).catch(err => {
-        console.error('Kopyalama hatası:', err);
+        logger.error('Kopyalama hatası:', err);
         // Fallback: Eski yöntem
         const textArea = document.createElement('textarea');
         textArea.value = textToCopy;
@@ -199,6 +237,8 @@ function copyZikirFromElement(button) {
                 
                 // "Kopyalandı" tooltip'i göster
                 showCopyTooltip(button);
+                showSuccess('Zikir kopyalandı');
+                announceToScreenReader('Zikir panoya kopyalandı');
                 
                 setTimeout(() => {
                     icon.className = originalClass;
@@ -207,7 +247,8 @@ function copyZikirFromElement(button) {
                 }, 2000);
             }
         } catch (err) {
-            alert('Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.');
+            showError('Kopyalama başarısız oldu. Lütfen tekrar deneyin.');
+            announceToScreenReader('Kopyalama başarısız oldu');
         }
         document.body.removeChild(textArea);
     });
@@ -217,6 +258,8 @@ function toggleTranslation() {
     showTranslation = !showTranslation;
     const btn = document.getElementById('translationBtn');
     const translations = document.querySelectorAll('.zikir-translation');
+    
+    btn.setAttribute('aria-pressed', showTranslation.toString());
     
     translations.forEach(trans => {
         if (showTranslation) {
@@ -229,20 +272,26 @@ function toggleTranslation() {
             btn.classList.remove('active');
         }
     });
+    
+    announceToScreenReader(showTranslation ? 'Tercümeler gösteriliyor' : 'Tercümeler gizlendi');
 }
 
 function toggleDarkMode() {
     darkMode = !darkMode;
     const btn = document.getElementById('darkModeBtn');
     
+    btn.setAttribute('aria-pressed', darkMode.toString());
+    
     if (darkMode) {
         document.body.classList.add('dark-mode');
         btn.innerHTML = ' Açık Mod';
         btn.classList.add('active');
+        announceToScreenReader('Koyu mod etkinleştirildi');
     } else {
         document.body.classList.remove('dark-mode');
         btn.innerHTML = 'Koyu Mod';
         btn.classList.remove('active');
+        announceToScreenReader('Açık mod etkinleştirildi');
     }
 }
 
@@ -293,7 +342,7 @@ function handlePWAInstall() {
         pwaPrompt.prompt();
         pwaPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
-                console.log('Kullanıcı PWA yüklemeyi kabul etti');
+                logger.log('Kullanıcı PWA yüklemeyi kabul etti');
             }
             pwaPrompt = null;
             hidePWAInstallPrompt();
@@ -323,37 +372,38 @@ window.addEventListener('beforeinstallprompt', (e) => {
 document.getElementById('pwaAddBtn').addEventListener('click', handlePWAInstall);
 document.getElementById('pwaCloseBtn').addEventListener('click', hidePWAInstallPrompt);
 
-// Service Worker kayıt ve güncelleme kontrolü
-if ('serviceWorker' in navigator) {
+// Service Worker kayıt ve güncelleme kontrolü (sadece http/https; file:// desteklenmez)
+var isSecureOrigin = (location.protocol === 'http:' || location.protocol === 'https:');
+if (isSecureOrigin && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
             .then((registration) => {
-                console.log('Service Worker kayıt başarılı:', registration.scope);
+                logger.log('Service Worker kayıt başarılı:', registration.scope);
                 
-                // Yeni Service Worker kontrolü
+                if (!navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.addEventListener('controllerchange', () => {});
+                }
+                
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // Yeni Service Worker yüklendi, sayfayı yenile
-                            console.log('Yeni Service Worker yüklendi, sayfa yenileniyor...');
+                            logger.log('Yeni Service Worker yüklendi, sayfa yenileniyor...');
                             window.location.reload();
                         }
                     });
                 });
             })
             .catch((error) => {
-                console.log('Service Worker kayıt hatası:', error);
+                logger.error('Service Worker kayıt hatası:', error);
+                showError('Service Worker yüklenemedi. Offline özellikler çalışmayabilir.');
             });
         
-        // Periyodik olarak güncelleme kontrolü
         setInterval(() => {
             navigator.serviceWorker.getRegistration().then(registration => {
-                if (registration) {
-                    registration.update();
-                }
+                if (registration) registration.update();
             });
-        }, 60000); // Her 60 saniyede bir kontrol et
+        }, 60000);
     });
 }
 
@@ -517,9 +567,286 @@ window.addEventListener('scroll', () => {
     });
 }, { passive: true });
 
+// Loading States Fonksiyonları
+function showLoading() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) {
+        spinner.classList.add('show');
+        spinner.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function hideLoading() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) {
+        spinner.classList.remove('show');
+        spinner.setAttribute('aria-hidden', 'true');
+    }
+}
+
+// Toast Notification Fonksiyonları
+function showToast(message, type = 'error') {
+    const toastId = type === 'error' ? 'errorToast' : 'successToast';
+    const messageId = type === 'error' ? 'errorMessage' : 'successMessage';
+    const toast = document.getElementById(toastId);
+    const messageEl = document.getElementById(messageId);
+    
+    if (toast && messageEl) {
+        messageEl.textContent = message;
+        toast.setAttribute('aria-hidden', 'false');
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.setAttribute('aria-hidden', 'true');
+            }, 300);
+        }, 5000);
+    }
+}
+
+function showError(message) {
+    showToast(message, 'error');
+}
+
+function showSuccess(message) {
+    showToast(message, 'success');
+}
+
+// ARIA Live Region Fonksiyonu
+function announceToScreenReader(message) {
+    const liveRegion = document.getElementById('ariaLiveRegion');
+    if (liveRegion) {
+        liveRegion.textContent = message;
+        setTimeout(() => {
+            liveRegion.textContent = '';
+        }, 1000);
+    }
+}
+
+// Dua / Arapça yazı tipi seçimi (localStorage + CSS variable)
+function applyArabicFont(fontFamily) {
+    if (!fontFamily) return;
+    const value = "'" + fontFamily + "', serif";
+    document.documentElement.style.setProperty('--font-arabic', value);
+    try { localStorage.setItem('arabicFont', fontFamily); } catch (e) {}
+    const preview = document.getElementById('arabicFontPreview');
+    if (preview) preview.style.fontFamily = value;
+}
+
+function initArabicFontChoice() {
+    const select = document.getElementById('arabicFontSelect');
+    if (!select) return;
+    let saved = null;
+    try { saved = localStorage.getItem('arabicFont'); } catch (e) {}
+    if (saved) {
+        const opt = Array.from(select.options).find(o => o.value === saved);
+        if (opt) { select.value = saved; applyArabicFont(saved); }
+    }
+    select.addEventListener('change', function() {
+        applyArabicFont(this.value);
+    });
+}
+
+// Paylaş (Yardım menüsü)
+function getShareUrl() {
+    return document.querySelector('link[rel="canonical"]') ? document.querySelector('link[rel="canonical"]').href : window.location.href;
+}
+
+function getShareText() {
+    return 'Sabah ve akşam zikirlerini okumayı unutmayın. Sahih hadislerle derlenen zikir programına göz atın!';
+}
+
+function shareApp() {
+    const url = getShareUrl();
+    const text = getShareText();
+    if (navigator.share) {
+        navigator.share({
+            title: 'Sabah-Akşam Zikirleri',
+            text: text,
+            url: url
+        }).then(() => {
+            showSuccess('Paylaşım başarılı');
+        }).catch((err) => {
+            if (err.name !== 'AbortError') showError('Paylaşım iptal edildi veya başarısız.');
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            showSuccess('Link kopyalandı. Paylaşmak için yapıştırın.');
+        }).catch(() => {
+            showError('Link kopyalanamadı.');
+        });
+    }
+}
+
+function initShareLinks() {
+    const url = encodeURIComponent(getShareUrl());
+    const text = encodeURIComponent(getShareText());
+    const wa = document.getElementById('shareWhatsApp');
+    const tw = document.getElementById('shareTwitter');
+    if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(getShareText() + ' ' + getShareUrl());
+    if (tw) tw.href = 'https://twitter.com/intent/tweet?text=' + text + '&url=' + url;
+}
+
+// Yardım Modal Fonksiyonları
+function showHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) {
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        // Focus'u modal içindeki ilk öğeye taşı
+        const closeBtn = modal.querySelector('.help-modal-close');
+        if (closeBtn) {
+            closeBtn.focus();
+        }
+        announceToScreenReader('Yardım menüsü açıldı');
+    }
+}
+
+function closeHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        // Focus'u yardım butonuna geri taşı
+        const helpBtn = document.querySelector('.help-button');
+        if (helpBtn) {
+            helpBtn.focus();
+        }
+        announceToScreenReader('Yardım menüsü kapatıldı');
+    }
+}
+
+// Keyboard Navigation - Yardım Butonu
+document.addEventListener('DOMContentLoaded', () => {
+    const helpButton = document.querySelector('.help-button');
+    if (helpButton) {
+        helpButton.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                showHelpModal();
+            }
+        });
+    }
+    
+    // Modal Kapatma Butonu için Keyboard Desteği
+    const modalCloseBtn = document.querySelector('.help-modal-close');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeHelpModal();
+            }
+        });
+    }
+    
+    // Tab Butonları için Ok Tuşu Desteği
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach((btn, index) => {
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const nextIndex = e.key === 'ArrowRight' 
+                    ? (index + 1) % tabButtons.length 
+                    : (index - 1 + tabButtons.length) % tabButtons.length;
+                tabButtons[nextIndex].focus();
+                tabButtons[nextIndex].click();
+            }
+        });
+    });
+    
+    // Control Butonları için Keyboard Desteği
+    const controlButtons = document.querySelectorAll('.control-button');
+    controlButtons.forEach(btn => {
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                btn.click();
+            }
+        });
+    });
+});
+
+// Modal dışına tıklanınca kapat
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('helpModal');
+    if (modal && e.target === modal) {
+        closeHelpModal();
+    }
+});
+
+// ESC tuşu ile modal kapat
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('helpModal');
+        if (modal && modal.classList.contains('show')) {
+            closeHelpModal();
+        }
+    }
+});
+
+// Development modu kontrolü
+const isDevelopment = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' ||
+                      window.location.hostname.includes('.local');
+
+// Console wrapper - Production'da console.log'ları gizle
+const logger = {
+    log: (...args) => {
+        if (isDevelopment) console.log(...args);
+    },
+    warn: (...args) => {
+        if (isDevelopment) console.warn(...args);
+    },
+    error: (...args) => {
+        // Error'lar her zaman gösterilmeli (hata takibi için)
+        console.error(...args);
+    }
+};
+
+// Performance Monitoring
+window.addEventListener('load', () => {
+    if ('performance' in window) {
+        const perfData = window.performance.timing;
+        const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+        logger.log('Sayfa yükleme süresi:', pageLoadTime, 'ms');
+        
+        // Core Web Vitals
+        if ('PerformanceObserver' in window) {
+            try {
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        if (entry.entryType === 'largest-contentful-paint') {
+                            logger.log('LCP:', entry.renderTime || entry.loadTime, 'ms');
+                        }
+                    }
+                });
+                observer.observe({ entryTypes: ['largest-contentful-paint'] });
+            } catch (e) {
+                logger.log('Performance Observer desteklenmiyor');
+            }
+        }
+    }
+});
+
 // Sayfa yüklendiğinde sabah zikirlerini göster
 document.addEventListener('DOMContentLoaded', () => {
-    renderZikirler('sabah');
+    // Kayıtlı Arapça yazı tipi seçimini uygula
+    initArabicFontChoice();
+    // Paylaş linklerini güncelle
+    initShareLinks();
+
+    // URL parametresini kontrol et
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    
+    // Eğer tab parametresi varsa ve geçerliyse onu kullan, yoksa sabah'ı göster
+    const defaultTab = (tab === 'aksam' || tab === 'sabah') ? tab : 'sabah';
+    
+    // İlgili sekmeyi göster
+    showZikir(defaultTab);
     
     // İlk progress güncellemesi
     setTimeout(() => {
@@ -532,5 +859,15 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             showPWAInstallPrompt();
         }, 2000);
+    }
+    
+    // Service Worker hatalarını yakala (sadece http/https ortamında)
+    if (isSecureOrigin && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(registration => {
+            if (!registration) logger.warn('Service Worker kayıtlı değil');
+        }).catch(error => {
+            logger.error('Service Worker kontrol hatası:', error);
+            showError('Service Worker yüklenemedi. Lütfen sayfayı yenileyin.');
+        });
     }
 });

@@ -4,6 +4,7 @@
     src: url('../fonts/Loubag-Black.ttf') format('truetype');
     font-weight: 900;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -11,6 +12,7 @@
     src: url('../fonts/Loubag-Light.ttf') format('truetype');
     font-weight: 300;
     font-style: normal;
+    font-display: swap;
 }
 
 :root {
@@ -20,12 +22,621 @@
     --text-dark: #333;
     --text-light: #fdf5e6;
     --transition-speed: 0.5s;
+    --font-arabic: 'Noto Naskh Arabic', 'Reem Kufi Ink', serif;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/*
+ *  STYLE 13
+ */
+
+
+ 
+::-webkit-scrollbar
+ {
+     width: 10px;
+     background-color:transparent;
+ }
+ 
+::-webkit-scrollbar-thumb
+ {
+     background-color: #D62929;
+     background-image: -webkit-linear-gradient(90deg,
+                                               transparent,
+                                               rgba(0, 0, 0, 0.4) 50%,
+                                               transparent,
+                                               transparent)
+ }
+ 
+
+
+body.dark-mode .help-button {
+    background: var(--primary-red);
+    box-shadow: 0 4px 15px rgba(212, 33, 33, 0.6);
+}
+
+body.dark-mode .help-button:hover {
+    background: #ff5252;
+    box-shadow: 0 6px 20px rgba(255, 82, 82, 0.8);
+}
+
+/* Focus - Butonlarda outline kaldırıldı */
+button:focus {
+    outline: none;
+}
+
+a:focus {
+    outline: 3px solid var(--primary-red);
+    outline-offset: 2px;
+}
+
+/* Sosyal butonlar (GitHub vb.) – outline yok */
+.social-link:focus {
+    outline: none;
+}
+
+/* Screen Reader Only - Görünmez ama erişilebilir */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 10px;
+    z-index: 10003;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .loading-spinner {
+    background: rgba(42, 42, 62, 0.95);
+    color: var(--text-light);
+}
+
+.loading-spinner.show {
+    display: block;
+}
+
+.spinner-wrap {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 15px;
+}
+
+.spinner-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    z-index: 1;
+    object-fit: contain;
+}
+
+.spinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 4px solid rgba(212, 33, 33, 0.2);
+    border-top: 4px solid var(--primary-red);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+body.dark-mode .spinner {
+    border-color: rgba(255, 107, 107, 0.2);
+    border-top-color: #ff6b6b;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+body.dark-mode .loading-spinner p {
+    color: var(--text-light);
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10004;
+    opacity: 0;
+    transition: all 0.3s ease;
+    min-width: 300px;
+    max-width: 90%;
+    direction: ltr;
+    text-align: left;
+}
+
+body.dark-mode .toast {
+    background: #2a2a3e;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-right: 4px solid #dc3545;
+}
+
+body.dark-mode .toast-error {
+    background: rgba(248, 215, 218, 0.2);
+    color: #f8d7da;
+    border-right-color: #dc3545;
+}
+
+.toast-success {
+    background: #d4edda;
+    color: #155724;
+    border-right: 4px solid #28a745;
+}
+
+body.dark-mode .toast-success {
+    background: rgba(212, 237, 218, 0.2);
+    color: #d4edda;
+    border-right-color: #28a745;
+}
+
+.toast i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.toast span {
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    font-size: 0.9rem;
+}
+
+/* Touch Target Size - Minimum 44x44px */
+.copy-btn-item {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+
+
+/* Help Modal */
+.help-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10002;
+    overflow-y: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.help-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+}
+
+.help-modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 1000px;
+    width: 90%;
+    max-height: 90vh;
+    margin: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    direction: ltr;
+    text-align: left;
+}
+
+body.dark-mode .help-modal-content {
+    background: #2a2a3e;
+    color: var(--text-light);
+}
+
+.help-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 2px solid rgba(212, 33, 33, 0.2);
+    direction: ltr;
+}
+
+body.dark-mode .help-modal-header {
+    border-bottom-color: rgba(255, 107, 107, 0.2);
+}
+
+.help-modal-header h2 {
+    font-family: 'Loubag-Black', sans-serif;
+    font-size: 1.8rem;
+    color: var(--primary-red);
+    margin: 0;
+    font-weight: 900;
+}
+
+body.dark-mode .help-modal-header h2 {
+    color: #ff6b6b;
+}
+
+.help-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.help-modal-close:hover {
+    background: rgba(212, 33, 33, 0.1);
+    color: var(--primary-red);
+}
+
+.help-modal-close:focus {
+    outline: none;
+}
+
+body.dark-mode .help-modal-close {
+    color: #ccc;
+}
+
+body.dark-mode .help-modal-close:hover {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+}
+
+.help-modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.help-section {
+    margin-bottom: 30px;
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.arabic-font-select {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 12px 0 15px;
+    padding: 10px 14px;
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    font-size: 1rem;
+    border: 2px solid rgba(212, 33, 33, 0.3);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+body.dark-mode .arabic-font-select {
+    background: #2a2a3e;
+    color: var(--text-light);
+    border-color: rgba(255, 107, 107, 0.3);
+}
+
+.arabic-font-preview {
+    font-size: 1.5rem;
+    line-height: 2.2;
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(212, 33, 33, 0.06) 0%, rgba(212, 33, 33, 0.02) 100%);
+    border: 1px solid rgba(212, 33, 33, 0.15);
+    color: var(--primary-red);
+    text-align: right;
+    direction: rtl;
+    font-family: var(--font-arabic);
+}
+
+body.dark-mode .arabic-font-preview {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0.03) 100%);
+    border-color: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+}
+
+.help-section h3 {
+    font-family: 'Loubag-Black', sans-serif;
+    font-size: 1.4rem;
+    color: var(--primary-red);
+    margin-bottom: 15px;
+    font-weight: 900;
+    text-align: left;
+}
+
+body.dark-mode .help-section h3 {
+    color: #ff6b6b;
+}
+
+.help-section p {
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+body.dark-mode .help-section p {
+    color: var(--text-light);
+}
+
+.help-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.help-section ul li {
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.help-section ul li::before {
+    content: "•";
+    color: var(--primary-red);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+body.dark-mode .help-section ul li {
+    color: var(--text-light);
+}
+
+body.dark-mode .help-section ul li::before {
+    color: #ff6b6b;
+}
+
+.help-section .hadith,
+.help-section .verse {
+    background: rgba(212, 33, 33, 0.05);
+    border-left: 4px solid var(--primary-red);
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-style: italic;
+    margin: 15px 0;
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    text-align: left;
+}
+
+body.dark-mode .help-section .hadith,
+body.dark-mode .help-section .verse {
+    background: rgba(255, 107, 107, 0.1);
+    border-left-color: #ff6b6b;
+}
+
+/* Paylaş bölümü */
+.share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Loubag-Black', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 900;
+    cursor: pointer;
+    color: white;
+    background: var(--primary-red);
+    transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+    background: #b01d1d;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 33, 33, 0.4);
+}
+
+.share-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-family: 'Loubag-Black', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.share-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.share-whatsapp {
+    background: #25D366;
+}
+
+.share-whatsapp:hover {
+    background: #1da851;
+}
+
+.share-twitter {
+    background: #1DA1F2;
+}
+
+.share-twitter:hover {
+    background: #0d8bd9;
+}
+
+.share-btn:focus,
+.share-link:focus {
+    outline: none;
+}
+
+/* Social Links */
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-family: 'Loubag-Black', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 900;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social-link i {
+    font-size: 1.1rem;
+}
+
+.social-twitter {
+    background: #1DA1F2;
+}
+
+.social-twitter:hover {
+    background: #0d8bd9;
+}
+
+.social-instagram {
+    background: linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCB045 100%);
+}
+
+.social-instagram:hover {
+    background: linear-gradient(135deg, #7229a0 0%, #e01a1a 50%, #e09d3d 100%);
+}
+
+.social-github {
+    background: #333;
+}
+
+.social-github:hover {
+    background: #222;
+}
+
+.social-linkedin {
+    background: #0077B5;
+}
+
+.social-linkedin:hover {
+    background: #006399;
+}
+
+.social-youtube {
+    background: #FF0000;
+}
+
+.social-youtube:hover {
+    background: #cc0000;
+}
+
+.social-tiktok {
+    background: #000000;
+}
+
+.social-tiktok:hover {
+    background: #333333;
+}
+
+.social-username {
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 15px;
+    text-align: left;
+}
+
+body.dark-mode .social-username {
+    color: #999;
+}
+
+.social-username strong {
+    font-family: 'Loubag-Black', sans-serif;
+    color: var(--primary-red);
+    font-weight: 900;
+}
+
+body.dark-mode .social-username strong {
+    color: #ff6b6b;
 }
 
 body {
@@ -55,9 +666,29 @@ body.dark-mode {
 .footer-text {
     font-family: 'Playwrite DE Grund', 'Arial', sans-serif;
     font-size: 0.85rem;
-    color: #999;
+    color: #777;
     font-weight: 400;
     direction: rtl;
+    margin: 0;
+}
+
+.footer-link {
+    color: #777;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: var(--primary-red);
+    text-decoration: underline;
+}
+
+body.dark-mode .footer-link {
+    color: #888;
+}
+
+body.dark-mode .footer-link:hover {
+    color: #ff6b6b;
 }
 
 .footer-brand {
@@ -67,7 +698,7 @@ body.dark-mode {
 }
 
 body.dark-mode .footer-text {
-    color: #666;
+    color: #888;
 }
 
 body.dark-mode .footer-brand {
@@ -161,8 +792,9 @@ body.dark-mode .tab-button {
     display: flex;
     gap: 15px;
     justify-content: center;
+    align-items: stretch;
     margin-bottom: 30px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .control-button {
@@ -171,7 +803,7 @@ body.dark-mode .tab-button {
     font-family: 'Loubag-Black', sans-serif;
     font-weight: 900;
     border: 2px solid var(--primary-red);
-    border-radius: 25px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s;
     background-color: transparent;
@@ -199,6 +831,47 @@ body.dark-mode .control-button.active {
     box-shadow: 0 5px 15px rgba(212, 33, 33, 0.3);
 }
 
+/* Yardım butonu satırda (Tercüme + Koyu Mod ile aynı yükseklik) */
+.controls .help-button,
+.control-help-btn {
+    position: static;
+    width: auto;
+    min-width: 44px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 2px solid var(--primary-red);
+    background-color: transparent;
+    color: var(--primary-red);
+    font-size: 1.5rem;
+    box-shadow: none;
+}
+
+.controls .help-button i,
+.control-help-btn i {
+    font-size: 1.5rem;
+}
+
+.controls .help-button:hover,
+.control-help-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 33, 33, 0.3);
+}
+
+body.dark-mode .controls .help-button,
+body.dark-mode .control-help-btn {
+    background-color: transparent;
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+}
+
+body.dark-mode .controls .help-button:hover,
+body.dark-mode .control-help-btn:hover {
+    background: rgba(212, 33, 33, 0.15);
+}
+
 .zikir-content {
     display: none;
 }
@@ -219,15 +892,17 @@ body.dark-mode .control-button.active {
     }
 }
 
-.zikir-item {
+.zikir-item,
+article.zikir-item {
     background: white;
     border-radius: 15px;
-    padding: 30px;
+    padding: 30px 30px 10px 30px !important;
     margin-bottom: 25px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     font-family: 'Loubag-Light', 'Arial', sans-serif;
     position: relative;
+    display: block;
 }
 
 body.dark-mode .zikir-item {
@@ -249,9 +924,11 @@ body.dark-mode .zikir-item {
     position: relative;
 }
 
+/* Besmele fontu sabit; kullanıcı seçiminden etkilenmez */
+/* Besmele (بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ) fontu her zaman Reem Kufi Ink; asla değişmez */
 .zikir-besmele-arabic {
     font-size: 2.5rem;
-    font-family: 'Reem Kufi Ink', 'Rubik', 'Arial', 'Tahoma', sans-serif;
+    font-family: 'Reem Kufi Ink', serif;
     color: var(--primary-red);
     direction: rtl;
     line-height: 1.8;
@@ -270,7 +947,7 @@ body.dark-mode .zikir-item {
 
 .zikir-hamd-arabic {
     font-size: 1.9rem;
-    font-family: 'Rubik', 'Arial', 'Tahoma', sans-serif;
+    font-family: var(--font-arabic);
     color: var(--primary-red);
     direction: rtl;
     text-align: right;
@@ -303,7 +980,7 @@ body.dark-mode .zikir-hamd-arabic {
     margin-bottom: 15px;
     line-height: 2.5;
     color: var(--text-dark);
-    font-family: 'Rubik', 'Arial', 'Tahoma', sans-serif;
+    font-family: var(--font-arabic);
 }
 
 .zikir-title {
@@ -312,6 +989,14 @@ body.dark-mode .zikir-hamd-arabic {
     color: var(--primary-red);
     font-family: 'Loubag-Black', sans-serif;
     margin-bottom: 20px;
+    margin-top: 0;
+}
+
+/* H2 için genel stil */
+h2 {
+    font-family: 'Loubag-Black', sans-serif;
+    font-weight: 900;
+    margin-top: 0;
 }
 
 .zikir-tags-container {
@@ -319,7 +1004,6 @@ body.dark-mode .zikir-hamd-arabic {
     align-items: center;
     gap: 10px;
     margin-top: 10px;
-    margin-bottom: 20px;
     flex-wrap: wrap;
     position: relative;
 }
@@ -745,16 +1429,19 @@ body.dark-mode .circular-progress {
     position: absolute;
     top: 0;
     left: 0;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg) translateZ(0);
+    will-change: transform;
 }
 
 .progress-ring-circle {
-    transition: stroke-dashoffset 0.3s;
+    transition: stroke-dashoffset 0.3s ease-out;
 }
 
+/* Composite layer: stroke-dashoffset animasyonu ayrı katmanda (Lighthouse birleştirilmemiş animasyon uyarısı) */
 .progress-ring-progress {
     stroke-dasharray: 157.08;
     stroke-dashoffset: 157.08;
+    transform: translateZ(0);
 }
 
 .circular-progress-text {
@@ -825,39 +1512,49 @@ body.dark-mode .linear-progress {
     }
 
     .buttons-wrapper {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
         margin-bottom: 30px;
     }
 
     .button-group {
-        display: contents;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
         margin-bottom: 0;
     }
 
     .controls {
-        display: contents;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        justify-content: center;
+        align-items: stretch;
         margin-bottom: 0;
+        min-width: 0;
     }
 
     .tab-button {
         padding: 12px 15px;
         font-size: 0.9rem;
-        width: 100%;
+        flex: 1;
+        min-width: 0;
         margin: 0;
-        grid-column: auto;
-        grid-row: auto;
     }
 
     .control-button {
         padding: 10px 12px;
-        font-size: 0.85rem;
-        width: 100%;
+        font-size: 0.8rem;
+        width: auto;
+        min-width: 0;
+        flex: 0 1 auto;
         margin: 0;
-        grid-column: auto;
-        grid-row: auto;
+        border-radius: 6px;
+    }
+
+    .controls .control-button {
+        white-space: nowrap;
     }
 
     .zikir-title {
@@ -988,5 +1685,40 @@ body.dark-mode .linear-progress {
 
     .linear-progress-text {
         font-size: 0.7rem;
+    }
+
+    /* Yardım butonu satırda; diğer butonlarla aynı yükseklik, ikon büyük */
+    .controls .help-button,
+    .control-help-btn {
+        position: static;
+        width: auto;
+        min-width: 44px;
+        padding: 0 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        border-radius: 6px;
+        flex: 0 0 auto;
+    }
+    .controls .help-button i,
+    .control-help-btn i {
+        font-size: 1.4rem;
+    }
+
+    .help-modal-content {
+        max-width: 95%;
+        max-height: 90vh;
+    }
+
+    .control-button,
+    .tab-button {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+
+    .toast {
+        min-width: 250px;
+        padding: 12px 16px;
     }
 }

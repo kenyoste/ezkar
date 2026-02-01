@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
+# Sitemap
 Sitemap: https://kenyoste.com/ezkar/sitemap.xml
+
