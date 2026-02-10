@@ -325,16 +325,19 @@ $totalVisits = getTotalVisitCount();
     <!-- Footer -->
     <footer class="footer">
         <p class="footer-text">
-            POWERED by <span class="footer-brand">kenyoste</span>
+            <span class="footer-powered">
+                POWERED by <span class="footer-brand">kenyoste</span>
+            </span>
             <br>
-            Bu sayfa toplam
-            <strong class="footer-visit-count">
-                <span
-                    id="visitCount"
-                    data-target="<?php echo htmlspecialchars((string)$totalVisits, ENT_QUOTES, 'UTF-8'); ?>"
-                >0</span>
-            </strong>
-            kez ziyaret edildi.
+            <span class="footer-count-row">
+                Toplam okuma:
+                <strong class="footer-visit-count">
+                    <span
+                        id="visitCount"
+                        data-target="<?php echo htmlspecialchars((string)$totalVisits, ENT_QUOTES, 'UTF-8'); ?>"
+                    >0</span>
+                </strong>
+            </span>
         </p>
     </footer>
 

@@ -659,8 +659,9 @@ body.dark-mode {
 }
 
 .footer {
-    text-align: right;
-  
+    position: relative;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .footer-text {
@@ -670,6 +671,21 @@ body.dark-mode {
     font-weight: 400;
     direction: rtl;
     margin: 0;
+}
+
+.footer-count-row {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    direction: ltr;
+}
+
+.footer-powered {
+    position: absolute;
+    right: 16px;
+    bottom: 0;
+    font-size: 0.8rem;
+    direction: ltr;
 }
 
 .footer-visit-count {
