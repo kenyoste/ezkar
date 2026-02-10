@@ -1,3 +1,7 @@
+<?php
+require __DIR__ . '/counter.php';
+$totalVisits = getTotalVisitCount();
+?>
 <!DOCTYPE html>
 <html lang="tr" dir="rtl">
 <head>
@@ -276,14 +280,6 @@
         <nav aria-label="Ana navigasyon">
             <div class="buttons-wrapper">
                 <div class="button-group" role="tablist" aria-label="Zikir seçimi">
-                    <button class="tab-button active" 
-                            role="tab" 
-                            aria-selected="true" 
-                            aria-controls="sabah-content"
-                            id="sabah-tab"
-                            onclick="showZikir('sabah', this)">
-                      </i> Sabah Zikirleri
-                    </button>
                     <button class="tab-button" 
                             role="tab" 
                             aria-selected="false" 
@@ -292,6 +288,14 @@
                             onclick="showZikir('aksam', this)">
                        </i> Akşam Zikirleri
                     </button>
+                    <button class="tab-button active" 
+                    role="tab" 
+                    aria-selected="true" 
+                    aria-controls="sabah-content"
+                    id="sabah-tab"
+                    onclick="showZikir('sabah', this)">
+              </i> Sabah Zikirleri
+            </button>
                 </div>
             </div>
         </nav>
@@ -302,12 +306,16 @@
                     <button class="help-button control-help-btn" onclick="showHelpModal()" aria-label="Yardım">
                         <i class="fas fa-question-circle"></i>
                     </button>
+                    <button class="control-button" onclick="toggleFocusMode()" id="focusModeBtn" aria-label="Derin odak modu (tam ekran)" title="Derin odak modu">
+                        <i class="fas fa-expand" aria-hidden="true"></i>
+                    </button>
                     <button class="control-button" onclick="toggleDarkMode()" id="darkModeBtn" aria-pressed="false">
                         Koyu Mod   
                        </button>
                        <button class="control-button" onclick="toggleTranslation()" id="translationBtn" aria-pressed="false">
                         Tercümeyi Göster 
                      </button>
+                   
                 </div>
 
         <section id="sabah-content" class="zikir-content active" aria-label="Sabah Zikirleri"></section>
@@ -318,7 +326,15 @@
     <footer class="footer">
         <p class="footer-text">
             POWERED by <span class="footer-brand">kenyoste</span>
-            |
+            <br>
+            Bu sayfa toplam
+            <strong class="footer-visit-count">
+                <span
+                    id="visitCount"
+                    data-target="<?php echo htmlspecialchars((string)$totalVisits, ENT_QUOTES, 'UTF-8'); ?>"
+                >0</span>
+            </strong>
+            kez ziyaret edildi.
         </p>
     </footer>
 
@@ -339,6 +355,11 @@
     <!-- Scroll to Top Button -->
     <button id="scrollToTopBtn" class="scroll-to-top" onclick="scrollToTop()" aria-label="En üste dön">
         <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Derin odak modundan çıkış (sadece focus-mode'da görünür) -->
+    <button id="focusModeExitBtn" class="focus-mode-exit" onclick="toggleFocusMode()" aria-label="Tam ekrandan çık" title="Tam ekrandan çık">
+        <i class="fas fa-compress-alt" aria-hidden="true"></i>
     </button>
 
     <!-- PWA Install Prompt -->

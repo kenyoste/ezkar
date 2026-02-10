@@ -672,6 +672,37 @@ body.dark-mode {
     margin: 0;
 }
 
+.footer-visit-count {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+#visitCount {
+    display: inline-block;
+    min-width: 1.5ch;
+}
+
+.visit-plus-one {
+    position: relative;
+    display: inline-block;
+    margin-left: 4px;
+    color: #28a745;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.visit-plus-one.show {
+    opacity: 1;
+    transform: translateY(-10px);
+}
+
+body.dark-mode .visit-plus-one {
+    color: #4ade80;
+}
+
 .footer-link {
     color: #777;
     text-decoration: none;
@@ -795,6 +826,8 @@ body.dark-mode .tab-button {
     align-items: stretch;
     margin-bottom: 30px;
     flex-wrap: nowrap;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .control-button {
@@ -870,6 +903,105 @@ body.dark-mode .control-help-btn {
 body.dark-mode .controls .help-button:hover,
 body.dark-mode .control-help-btn:hover {
     background: rgba(212, 33, 33, 0.15);
+}
+
+/* Derin odak modu (tam ekran): sadece Arapça, kaç defa, zikirmatik */
+.focus-mode-exit {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: 2px solid var(--primary-red);
+    background: var(--bg-light);
+    color: var(--primary-red);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.focus-mode-exit i {
+    font-size: 1.35em;
+}
+.focus-mode-exit:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(212, 33, 33, 0.25);
+}
+body.dark-mode .focus-mode-exit {
+    background: var(--bg-dark);
+    color: var(--primary-red);
+}
+
+body.focus-mode .header,
+body.focus-mode nav,
+body.focus-mode .controls,
+body.focus-mode .footer,
+body.focus-mode .scroll-to-top {
+    display: none !important;
+}
+
+/* Tam ekranda scroll yüzdesi görünsün; çıkış butonu sağda olduğu için sol üste al */
+body.focus-mode .scroll-progress-container {
+    display: flex !important;
+    top: 16px;
+    left: 16px;
+    right: auto;
+}
+
+body.focus-mode .focus-mode-exit {
+    display: flex !important;
+}
+
+body.focus-mode main.container {
+    max-width: 100%;
+    padding: 60px 20px 30px;
+}
+
+/* Tam ekran API ile ekranı tamamen kapla */
+html:fullscreen,
+html:-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-light);
+}
+
+html:fullscreen body.dark-mode,
+html:-webkit-full-screen body.dark-mode {
+    background: var(--bg-dark);
+}
+
+html:fullscreen body.focus-mode,
+html:-webkit-full-screen body.focus-mode {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+html:fullscreen body.focus-mode main.container,
+html:-webkit-full-screen body.focus-mode main.container {
+    min-height: 100%;
+    height: auto;
+    box-sizing: border-box;
+    padding: 56px 16px 24px;
+}
+
+body.focus-mode .zikir-item .copy-btn-item,
+body.focus-mode .zikir-item .zikir-title,
+body.focus-mode .zikir-item .zikir-footnote,
+body.focus-mode .zikir-item .zikir-translation,
+body.focus-mode .zikir-item .zikir-pronunciation,
+body.focus-mode .zikir-besmele .zikir-pronunciation,
+body.focus-mode .zikir-besmele .zikir-translation,
+body.focus-mode .zikir-hamd .zikir-pronunciation,
+body.focus-mode .zikir-hamd .zikir-translation {
+    display: none !important;
 }
 
 .zikir-content {
@@ -976,6 +1108,7 @@ body.dark-mode .zikir-hamd-arabic {
 .zikir-arabic {
     font-size: 1.8rem;
     text-align: right;
+    padding-top: 20px;
     direction: rtl;
     margin-bottom: 15px;
     line-height: 2.5;
@@ -1016,6 +1149,156 @@ h2 {
     font-family: 'Playwrite DE Grund', 'Arial', sans-serif;
     font-weight: 400;
     direction: ltr;
+}
+
+/* Zikirmatik - dairesel tıklanabilir sayaç */
+.zikirmatik-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.zikirmatik-label {
+    font-size: 0.5rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+body.dark-mode .zikirmatik-label {
+    color: #888;
+}
+
+.zikirmatik {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.zikirmatik:hover {
+    transform: scale(1.08);
+}
+
+.zikirmatik:active {
+    transform: scale(0.95);
+}
+
+.zikirmatik-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.zikirmatik-ring svg {
+    width: 100%;
+    height: 100%;
+}
+
+.zikirmatik-ring-bg {
+    stroke: rgba(212, 33, 33, 0.2);
+}
+
+.zikirmatik-ring-fill {
+    stroke: var(--primary-red);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
+}
+
+.zikirmatik-ring-fill.complete {
+    stroke: #28a745;
+}
+
+.zikirmatik-center {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--primary-red);
+    line-height: 1;
+}
+
+.zikirmatik-num {
+    min-width: 1ch;
+}
+
+.zikirmatik-sep {
+    opacity: 0.7;
+}
+
+.zikirmatik-target {
+    min-width: 1ch;
+}
+
+.zikirmatik-tick {
+    color: #28a745;
+    font-size: 0.5rem;
+    margin-left: 1px;
+}
+
+.zikirmatik-tick.hidden {
+    display: none;
+}
+
+.zikirmatik-tick:not(.hidden) {
+    animation: zikirmatik-tick-in 0.6s ease-out forwards;
+}
+
+@keyframes zikirmatik-tick-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.zikirmatik-done .zikirmatik-center {
+    color: #28a745;
+}
+
+/* Tamamlandığında sadece sayı göster (100/100 taşmasını önle) */
+.zikirmatik-done .zikirmatik-sep,
+.zikirmatik-done .zikirmatik-target {
+    display: none;
+}
+
+body.dark-mode .zikirmatik-ring-bg {
+    stroke: rgba(212, 33, 33, 0.25);
+}
+
+body.dark-mode .zikirmatik-ring-fill.complete {
+    stroke: #4ade80;
+}
+
+body.dark-mode .zikirmatik-done .zikirmatik-center {
+    color: #4ade80;
+}
+
+body.dark-mode .zikirmatik-tick {
+    color: #4ade80;
 }
 
 .zikir-footnote {
@@ -1216,7 +1499,7 @@ body.dark-mode .copy-btn-hamd:hover {
 }
 
 .scroll-to-top.show {
-    /* Opacity JavaScript tarafından dinamik olarak ayarlanacak */
+    visibility: visible;
 }
 
 .scroll-to-top:hover {
@@ -1251,12 +1534,40 @@ body.dark-mode .zikir-footnote {
     color: #74b9ff;
 }
 
+/* Çeviri ve Türkçe okunuş LTR (soldan sağa) */
+.zikir-translation,
+.zikir-pronunciation,
+.ltr-block {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Blok başlığı: Tercüme / Türkçe okunuş (minimal) */
+.zikir-block-label {
+    display: block;
+    font-size: 0.55rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: #555;
+    margin-bottom: 6px;
+    font-family: inherit;
+    font-style: normal;
+}
+
+body.dark-mode .zikir-block-label {
+    color: #777;
+}
+
+.zikir-translation .zikir-block-content,
+.zikir-pronunciation .zikir-block-content {
+    padding-top: 0;
+}
+
 .zikir-translation {
     font-size: 1.1rem;
-    text-align: left;
-    direction: rtl;
     color: #666;
     padding: 20px;
+    padding-top: 8px;
     background: #f9f9f9;
     border-radius: 10px;
     border-left: 4px solid var(--primary-red);
@@ -1265,12 +1576,31 @@ body.dark-mode .zikir-footnote {
     font-family: 'Loubag-Light', 'Arial', sans-serif;
 }
 
+.zikir-pronunciation {
+    font-size: 1.05rem;
+    color: #555;
+    padding: 12px 20px;
+    padding-top: 8px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    border-left: 4px solid rgba(212, 33, 33, 0.6);
+    margin-top: 10px;
+    font-family: 'Loubag-Light', 'Arial', sans-serif;
+}
+
 body.dark-mode .zikir-translation {
     background: #1f1f35;
     color: #ccc;
 }
 
-.zikir-translation.hidden {
+body.dark-mode .zikir-pronunciation {
+    background: #252540;
+    color: #bbb;
+}
+
+
+.zikir-translation.hidden,
+.zikir-pronunciation.hidden {
     display: none;
 }
 
@@ -1528,11 +1858,12 @@ body.dark-mode .linear-progress {
     .controls {
         display: flex;
         flex-wrap: nowrap;
-        gap: 8px;
+        gap: 6px;
         justify-content: center;
         align-items: stretch;
-        margin-bottom: 0;
+        margin-bottom: 20px;
         min-width: 0;
+        padding: 0 6px;
     }
 
     .tab-button {
@@ -1544,8 +1875,8 @@ body.dark-mode .linear-progress {
     }
 
     .control-button {
-        padding: 10px 12px;
-        font-size: 0.8rem;
+        padding: 8px 10px;
+        font-size: clamp(0.6rem, 2vw, 0.8rem);
         width: auto;
         min-width: 0;
         flex: 0 1 auto;
@@ -1555,6 +1886,18 @@ body.dark-mode .linear-progress {
 
     .controls .control-button {
         white-space: nowrap;
+    }
+
+    .controls .help-button,
+    .controls .control-help-btn {
+        min-width: 40px;
+        padding: 0 10px;
+        font-size: 1.2rem;
+    }
+
+    .controls .help-button i,
+    .controls .control-help-btn i {
+        font-size: 1.2rem;
     }
 
     .zikir-title {
@@ -1593,6 +1936,10 @@ body.dark-mode .linear-progress {
 
     .zikir-translation {
         font-size: 1rem;
+    }
+
+    .zikir-pronunciation {
+        font-size: 0.95rem;
     }
 
     .pwa-install-prompt {
@@ -1711,14 +2058,22 @@ body.dark-mode .linear-progress {
         max-height: 90vh;
     }
 
-    .control-button,
     .tab-button {
         min-height: 44px;
         padding: 12px 20px;
     }
 
+    .controls .control-button {
+        min-height: 40px;
+        padding: 8px 10px;
+    }
+
     .toast {
         min-width: 250px;
         padding: 12px 16px;
+    }
+    #focusModeBtn{
+        width: 40px;
+        height: 40px;
     }
 }

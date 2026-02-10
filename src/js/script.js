@@ -3,6 +3,67 @@
 let showTranslation = false;
 let darkMode = false;
 
+// Zikirmatik sayıları (sessionStorage'da tutulur)
+let zikirCounts = {};
+
+// Count metninden hedef sayıyı çıkar: "Üç kere okunur" -> 3
+function parseCount(countStr) {
+    if (!countStr) return 1;
+    const s = countStr.toLowerCase();
+    if (s.includes('bir')) return 1;
+    if (s.includes('üç') || s.includes('uc')) return 3;
+    if (s.includes('dört')) return 4;
+    if (s.includes('yedi')) return 7;
+    if (s.includes('on')) return 10;
+    if (s.includes('yüz') || s.includes('yuz')) return 100;
+    return 1;
+}
+
+// Zikirmatik daire çevresi (r=15)
+const ZIKIRMATIK_CIRCLE = 2 * Math.PI * 15;
+
+// Zikirmatik artır - tik at, hedefe ulaşınca sonraki zikre kay
+function incrementZikir(btn) {
+    const zikirId = btn.getAttribute('data-zikir-id');
+    const zikirBlock = btn.closest('.zikir-besmele, .zikir-hamd, .zikir-item');
+    if (!zikirId || !zikirBlock) return;
+    const target = parseInt(btn.getAttribute('data-target') || '1', 10);
+    const current = (zikirCounts[zikirId] || 0) + 1;
+    zikirCounts[zikirId] = current;
+    try { sessionStorage.setItem('zikirCounts', JSON.stringify(zikirCounts)); } catch (e) {}
+
+    const countEl = btn.querySelector('.zikirmatik-num');
+    const tickEl = btn.querySelector('.zikirmatik-tick');
+    const ringFill = btn.querySelector('.zikirmatik-ring-fill');
+    if (countEl) countEl.textContent = current;
+
+    // Daire ilerlemesi
+    const progress = Math.min(current / target, 1);
+    const offset = ZIKIRMATIK_CIRCLE * (1 - progress);
+    if (ringFill) ringFill.style.strokeDashoffset = offset;
+
+    const justReached = current === target;
+    if (current >= target && tickEl) {
+        btn.classList.add('zikirmatik-done');
+        tickEl.classList.remove('hidden');
+        if (ringFill) ringFill.classList.add('complete');
+        if (justReached) {
+            // Tik animasyonu bittikten sonra (600ms) sonraki duaya yavaşça geç
+            setTimeout(() => {
+                const content = zikirBlock.parentElement;
+                if (content) {
+                    const children = Array.from(content.children);
+                    const idx = children.indexOf(zikirBlock);
+                    const next = children[idx + 1];
+                    if (next) {
+                        next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }, 650);
+        }
+    }
+}
+
 function showZikir(type, buttonElement = null) {
     // Loading göster
     showLoading();
@@ -59,62 +120,86 @@ function showZikir(type, buttonElement = null) {
 }
 
 function renderZikirler(type) {
+    try {
+        const saved = sessionStorage.getItem('zikirCounts');
+        if (saved) zikirCounts = JSON.parse(saved);
+    } catch (e) {}
+
     const content = document.getElementById(type + '-content');
     const zikirList = zikirler[type];
     
     // Title gösterilecek dualar
     const titlesToShow = ["İHLÂS SÛRESİ", "FELAK SÛRESİ", "NÂS SÛRESİ", "AYETE'L-KÜRSÎ", "SEYYİDU'L-İSTİĞFAR"];
     
+    const escapeHtml = (str) => {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    };
+    
     content.innerHTML = zikirList.map((zikir, index) => {
-        // Besmele için özel render
-        if (zikir.title === "Besmele") {
-            return `
-                <div class="zikir-besmele">
-                    <div class="zikir-besmele-arabic">${zikir.arabic}</div>
-                </div>
-            `;
-        }
-        
-        // Hamd ve Salavat için özel render
-        if (zikir.title === "Hamd ve Salavat") {
-            return `
-                <div class="zikir-hamd">
-                    <div class="zikir-hamd-arabic">${zikir.arabic}</div>
-                </div>
-            `;
-        }
-        
-        // Diğer dualar için normal render - sadece belirli duaların title'ı gösterilir
-        const showTitle = titlesToShow.includes(zikir.title);
         const zikirId = `zikir-${type}-${index}`;
-        // Data attribute'ları için HTML escape
-        const escapeHtml = (str) => {
-            if (!str) return '';
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-        };
+        const targetCount = parseCount(zikir.count);
+        const currentCount = zikirCounts[zikirId] || 0;
+        const hasTick = currentCount >= targetCount;
+        const progress = targetCount > 0 ? Math.min(currentCount / targetCount, 1) : 0;
+        const ringOffset = (2 * Math.PI * 15) * (1 - progress);
+        const isAyetelKursi = zikir.title === "AYETE'L-KÜRSÎ";
+        const zikirmatikLabelHtml = isAyetelKursi ? '<span class="zikirmatik-label">zikirmatik</span>' : '';
+        const zikirmatikHtml = `<span class="zikirmatik-wrap" title="Tıkla: zikir sayacı"><button type="button" class="zikirmatik ${hasTick ? 'zikirmatik-done' : ''}" data-zikir-id="${zikirId}" data-target="${targetCount}" onclick="incrementZikir(this)" aria-label="Zikir sayacı: ${currentCount} / ${targetCount}"><span class="zikirmatik-ring"><svg viewBox="0 0 36 36"><circle class="zikirmatik-ring-bg" cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/><circle class="zikirmatik-ring-fill ${hasTick ? 'complete' : ''}" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" stroke-dasharray="94.25" stroke-dashoffset="${ringOffset}" transform="rotate(-90 18 18)"/></svg></span><span class="zikirmatik-center"><span class="zikirmatik-num">${currentCount}</span><span class="zikirmatik-sep">/</span><span class="zikirmatik-target">${targetCount}</span><span class="zikirmatik-tick ${hasTick ? '' : 'hidden'}"><i class="fas fa-check"></i></span></span></button>${zikirmatikLabelHtml}</span>`;
+
+        // Besmele için özel render (zikirmatik yok; etiket sadece Ayetel Kürsi'de)
+        if (zikir.title === "Besmele") {
+            const pron = zikir.pronunciation || '';
+            return `
+                <div class="zikir-besmele" data-zikir-id="${zikirId}" data-title="${escapeHtml(zikir.title)}" data-arabic="${escapeHtml(zikir.arabic)}" data-translation="${escapeHtml(zikir.translation)}" data-pronunciation="${escapeHtml(pron)}" data-count="${escapeHtml(zikir.count)}">
+                    <div class="zikir-besmele-arabic" dir="rtl" lang="ar">${zikir.arabic}</div>
+                    <div class="zikir-pronunciation ltr-block ${showTranslation && pron ? '' : 'hidden'}" dir="ltr"><div class="zikir-block-content">${pron}</div></div>
+                    <div class="zikir-translation ltr-block ${showTranslation ? '' : 'hidden'}" dir="ltr"><div class="zikir-block-content">${zikir.translation}</div></div>
+                </div>
+            `;
+        }
+        
+        // Hamd ve Salavat için özel render (zikirmatik yok; etiket sadece Ayetel Kürsi'de)
+        if (zikir.title === "Hamd ve Salavat") {
+            const pron = zikir.pronunciation || '';
+            return `
+                <div class="zikir-hamd" data-zikir-id="${zikirId}" data-title="${escapeHtml(zikir.title)}" data-arabic="${escapeHtml(zikir.arabic)}" data-translation="${escapeHtml(zikir.translation)}" data-pronunciation="${escapeHtml(pron)}" data-count="${escapeHtml(zikir.count)}">
+                    <div class="zikir-hamd-arabic" dir="rtl" lang="ar">${zikir.arabic}</div>
+                    <div class="zikir-pronunciation ltr-block ${showTranslation && pron ? '' : 'hidden'}" dir="ltr"><div class="zikir-block-content">${pron}</div></div>
+                    <div class="zikir-translation ltr-block ${showTranslation ? '' : 'hidden'}" dir="ltr"><div class="zikir-block-content">${zikir.translation}</div></div>
+                </div>
+            `;
+        }
+        
+        // Diğer dualar için normal render - sadece belirli duaların title'ı gösterilir; etiketler sadece Ayetel Kürsi'de
+        const showTitle = titlesToShow.includes(zikir.title);
+        const pron = zikir.pronunciation || '';
+        const labelOkunus = isAyetelKursi ? '<span class="zikir-block-label">Türkçe okunuş</span>' : '';
+        const labelTercume = isAyetelKursi ? '<span class="zikir-block-label">Tercüme</span>' : '';
         return `
-            <article class="zikir-item" data-zikir-id="${zikirId}" 
+            <article class="zikir-item" data-zikir-id="${zikirId}"
                  data-title="${escapeHtml(zikir.title)}"
                  data-arabic="${escapeHtml(zikir.arabic)}"
                  data-translation="${escapeHtml(zikir.translation)}"
+                 data-pronunciation="${escapeHtml(pron)}"
                  data-count="${escapeHtml(zikir.count)}"
                  data-footnote="${zikir.footnote ? escapeHtml(zikir.footnote) : ''}">
                 <button class="copy-btn-item" onclick="copyZikirFromElement(this)" title="Kopyala" aria-label="Zikri kopyala">
                     <i class="fas fa-copy"></i>
                 </button>
                 ${showTitle ? `<h2 class="zikir-title">${zikir.title}</h2>` : ''}
-                <div class="zikir-arabic">${zikir.arabic}</div>
+                <div class="zikir-arabic" dir="rtl" lang="ar">${zikir.arabic}</div>
                 <div class="zikir-tags-container">
                     <div class="zikir-count">${zikir.count}</div>
+                    ${zikirmatikHtml}
                     ${zikir.footnote ? `
                         <div class="zikir-footnote">
                             <i class="fas fa-book"></i> ${zikir.footnote}
                         </div>
                     ` : ''}
                 </div>
-                <div class="zikir-translation ${showTranslation ? '' : 'hidden'}">
-                    ${zikir.translation}
-                </div>
+                <div class="zikir-pronunciation ltr-block ${showTranslation && pron ? '' : 'hidden'}" dir="ltr">${labelOkunus}<div class="zikir-block-content">${pron}</div></div>
+                <div class="zikir-translation ltr-block ${showTranslation ? '' : 'hidden'}" dir="ltr">${labelTercume}<div class="zikir-block-content">${zikir.translation}</div></div>
             </article>
         `;
     }).join('');
@@ -166,6 +251,7 @@ function copyZikirFromElement(button) {
     const title = zikirItem.getAttribute('data-title') || '';
     const arabic = zikirItem.getAttribute('data-arabic') || '';
     const translation = zikirItem.getAttribute('data-translation') || '';
+    const pronunciation = zikirItem.getAttribute('data-pronunciation') || '';
     const count = zikirItem.getAttribute('data-count') || '';
     const footnote = zikirItem.getAttribute('data-footnote') || '';
     
@@ -179,6 +265,7 @@ function copyZikirFromElement(button) {
     const decodedTitle = decodeHtml(title);
     const decodedArabic = decodeHtml(arabic);
     const decodedTranslation = decodeHtml(translation);
+    const decodedPronunciation = decodeHtml(pronunciation);
     const decodedCount = decodeHtml(count);
     const decodedFootnote = decodeHtml(footnote);
     
@@ -196,6 +283,9 @@ function copyZikirFromElement(button) {
         textToCopy += `Kaynak: ${decodedFootnote}\n`;
     }
     
+    if (decodedPronunciation) {
+        textToCopy += `\nOkunuş:\n${decodedPronunciation}\n`;
+    }
     textToCopy += `\nTercüme:\n${decodedTranslation}`;
     
     // Kopyala
@@ -258,22 +348,35 @@ function toggleTranslation() {
     showTranslation = !showTranslation;
     const btn = document.getElementById('translationBtn');
     const translations = document.querySelectorAll('.zikir-translation');
+    const pronunciations = document.querySelectorAll('.zikir-pronunciation');
     
     btn.setAttribute('aria-pressed', showTranslation.toString());
+    
+    if (showTranslation) {
+        btn.innerHTML = ' Tercümeyi Gizle';
+        btn.classList.add('active');
+    } else {
+        btn.innerHTML = 'Tercümeyi Göster';
+        btn.classList.remove('active');
+    }
     
     translations.forEach(trans => {
         if (showTranslation) {
             trans.classList.remove('hidden');
-            btn.innerHTML = ' Tercümeyi Gizle';
-            btn.classList.add('active');
         } else {
             trans.classList.add('hidden');
-            btn.innerHTML = 'Tercümeyi Göster';
-            btn.classList.remove('active');
         }
     });
     
-    announceToScreenReader(showTranslation ? 'Tercümeler gösteriliyor' : 'Tercümeler gizlendi');
+    pronunciations.forEach(pron => {
+        if (showTranslation) {
+            pron.classList.remove('hidden');
+        } else {
+            pron.classList.add('hidden');
+        }
+    });
+    
+    announceToScreenReader(showTranslation ? 'Tercümeler ve okunuşlar gösteriliyor' : 'Tercümeler gizlendi');
 }
 
 function toggleDarkMode() {
@@ -294,6 +397,37 @@ function toggleDarkMode() {
         announceToScreenReader('Açık mod etkinleştirildi');
     }
 }
+
+function toggleFocusMode() {
+    const isFocus = document.body.classList.toggle('focus-mode');
+    const btn = document.getElementById('focusModeBtn');
+    if (btn) btn.setAttribute('aria-pressed', isFocus.toString());
+
+    if (isFocus) {
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (req) {
+            req.call(el).catch(function () {
+                announceToScreenReader('Tam ekran kullanılamadı');
+            });
+        }
+    } else {
+        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+        if (ex) ex.call(document);
+    }
+    announceToScreenReader(isFocus ? 'Derin odak modu açıldı' : 'Derin odak modu kapatıldı');
+}
+
+function onFullscreenChange() {
+    var inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (!inFs && document.body.classList.contains('focus-mode')) {
+        document.body.classList.remove('focus-mode');
+        var btn = document.getElementById('focusModeBtn');
+        if (btn) btn.setAttribute('aria-pressed', 'false');
+    }
+}
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
 // PWA Install Prompt
 let pwaPrompt = null;
@@ -373,17 +507,21 @@ document.getElementById('pwaAddBtn').addEventListener('click', handlePWAInstall)
 document.getElementById('pwaCloseBtn').addEventListener('click', hidePWAInstallPrompt);
 
 // Service Worker kayıt ve güncelleme kontrolü (sadece http/https; file:// desteklenmez)
+// SW_VERSION: sw.js içindeki CACHE_NAME ile aynı tutun; her yayında ikisini de artırın
+var SW_VERSION = '0.000.000.41';
 var isSecureOrigin = (location.protocol === 'http:' || location.protocol === 'https:');
 if (isSecureOrigin && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('sw.js?v=' + SW_VERSION)
             .then((registration) => {
                 logger.log('Service Worker kayıt başarılı:', registration.scope);
-                
+                // Sayfa her yüklendiğinde güncelleme kontrolü yap (tarayıcı 24h throttle yapabiliyor)
+                registration.update();
+
                 if (!navigator.serviceWorker.controller) {
                     navigator.serviceWorker.addEventListener('controllerchange', () => {});
                 }
-                
+
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     newWorker.addEventListener('statechange', () => {
@@ -398,7 +536,7 @@ if (isSecureOrigin && 'serviceWorker' in navigator) {
                 logger.error('Service Worker kayıt hatası:', error);
                 showError('Service Worker yüklenemedi. Offline özellikler çalışmayabilir.');
             });
-        
+
         setInterval(() => {
             navigator.serviceWorker.getRegistration().then(registration => {
                 if (registration) registration.update();
@@ -870,4 +1008,62 @@ document.addEventListener('DOMContentLoaded', () => {
             showError('Service Worker yüklenemedi. Lütfen sayfayı yenileyin.');
         });
     }
+
+    // Footer sayaç animasyonu (scroll ile görünce 0'dan hedefe artan sayı + +1 efekti)
+    initVisitCounterAnimation();
 });
+
+function initVisitCounterAnimation() {
+    const countEl = document.getElementById('visitCount');
+    const footer = document.querySelector('footer.footer');
+    if (!countEl || !footer) return;
+
+    const target = parseInt(countEl.getAttribute('data-target') || '0', 10);
+    if (!Number.isFinite(target) || target < 0) {
+        countEl.textContent = '0';
+        return;
+    }
+
+    // +1 animasyonu için eleman oluştur
+    const plusOne = document.createElement('span');
+    plusOne.className = 'visit-plus-one';
+    plusOne.textContent = '+1';
+    plusOne.setAttribute('aria-hidden', 'true');
+    footer.querySelector('.footer-text')?.appendChild(plusOne);
+
+    let animated = false;
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!animated && entry.isIntersecting) {
+                animated = true;
+                obs.disconnect();
+
+                const duration = 1000;
+                const startTime = performance.now();
+                const startValue = 0;
+
+                function step(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const current = Math.floor(startValue + (target - startValue) * progress);
+                    countEl.textContent = current.toString();
+
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        countEl.textContent = target.toString();
+                        // +1 animasyonunu tetikle
+                        plusOne.classList.add('show');
+                        setTimeout(() => {
+                            plusOne.classList.remove('show');
+                        }, 700);
+                    }
+                }
+
+                requestAnimationFrame(step);
+            }
+        });
+    }, { threshold: 0.25 });
+
+    observer.observe(footer);
+}

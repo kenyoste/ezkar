@@ -1,4 +1,4 @@
-const CACHE_NAME = '0.000.000.35';
+const CACHE_NAME = '1.000.000.03';
 const urlsToCache = [
   './',
   './index.html',
@@ -85,6 +85,14 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   // Sadece GET istekleri için cache stratejisi uygula
   if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // sw.js hiç önbelleğe alınmasın; güncelleme kontrolü her zaman güncel dosyayı görsün
+  if (event.request.url.includes('sw.js')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+    );
     return;
   }
 

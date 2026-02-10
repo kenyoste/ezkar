@@ -279,10 +279,16 @@ const zikirler = {
 
 ## 🔄 Güncelleme
 
-Service Worker cache versiyonu `sw.js` dosyasında `CACHE_NAME` değişkeninde tutulur. Yeni bir güncelleme yapıldığında bu versiyon numarasını artırın:
+Yeni bir PWA güncellemesi yayınlarken **iki yerde** versiyonu artırın (sayfa yenilendiğinde SW güncellemesinin algılanması için):
 
+1. **`sw.js`** – `CACHE_NAME` değişkeni:
 ```javascript
-const CACHE_NAME = 'zikirler-v13'; // Versiyon numarasını artırın
+const CACHE_NAME = '0.000.000.42'; // Versiyon numarasını artırın
+```
+
+2. **`src/js/script.js`** – `SW_VERSION` değişkeni (CACHE_NAME ile aynı değer):
+```javascript
+var SW_VERSION = '0.000.000.42'; // CACHE_NAME ile aynı tutun
 ```
 
 ## 🤝 Katkıda Bulunma

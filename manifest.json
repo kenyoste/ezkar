@@ -1,6 +1,6 @@
 {
   "name": "Sabah-Akşam Zikirleri",
-  "short_name": "Zikirler",
+  "short_name": "Ezkar",
   "description": "Sahih hadis kaynaklarından derlenmiş sabah ve akşam zikirleri. Buhari, Müslim, Tirmizi kaynaklarıyla.",
   "start_url": "/ezkar/",
   "scope": "/ezkar/",
