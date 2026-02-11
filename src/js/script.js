@@ -508,7 +508,7 @@ document.getElementById('pwaCloseBtn').addEventListener('click', hidePWAInstallP
 
 // Service Worker kayıt ve güncelleme kontrolü (sadece http/https; file:// desteklenmez)
 // SW_VERSION: sw.js içindeki CACHE_NAME ile aynı tutun; her yayında ikisini de artırın
-var SW_VERSION = '0.000.000.41';
+var SW_VERSION = '1.000.000.10';
 var isSecureOrigin = (location.protocol === 'http:' || location.protocol === 'https:');
 if (isSecureOrigin && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -1029,7 +1029,7 @@ function initVisitCounterAnimation() {
     plusOne.className = 'visit-plus-one';
     plusOne.textContent = '+1';
     plusOne.setAttribute('aria-hidden', 'true');
-    footer.querySelector('.footer-text')?.appendChild(plusOne);
+    footer.querySelector('.footer-count-wrap')?.appendChild(plusOne);
 
     let animated = false;
     const observer = new IntersectionObserver((entries, obs) => {

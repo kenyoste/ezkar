@@ -1,7 +1,7 @@
-const CACHE_NAME = '1.000.000.03';
+const CACHE_NAME = '1.000.000.11';
 const urlsToCache = [
   './',
-  './index.html',
+  './index.php',
   './manifest.json',
   './logo.webp',
   './logo.png',
@@ -30,6 +30,8 @@ const urlsToCache = [
   './src/img/ios/16.png',
   './src/js/dualar.js',
   './src/js/script.js',
+  './src/js/tesbihat.js',
+  './namaz-tesbihat.php',
   './src/style/style.css'
 ];
 
@@ -96,6 +98,44 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const url = new URL(event.request.url);
+
+  // script.js, style.css, dualar.js: HTTP cache bypass – güncelleme sonrası hep güncel sürüm gelsin
+  const path = url.pathname;
+  if (path.includes('script.js') || path.includes('style.css') || path.includes('dualar.js')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Ana sayfa (index.php) her zaman sunucudan alınsın; PHP sayaç vs güncel çalışsın (PWA'da 0 göstermeyi önler)
+  const isMainDoc = event.request.mode === 'navigate' ||
+    (event.request.destination === 'document') ||
+    (url.pathname.endsWith('/') || url.pathname.endsWith('/index.php'));
+  if (isMainDoc) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match('./index.php').then(r => r || caches.match('./')))
+    );
+    return;
+  }
+
   // Font dosyaları için network-first stratejisi
   if (event.request.url.includes('.ttf') || event.request.url.includes('Loubag')) {
     event.respondWith(
@@ -140,9 +180,13 @@ self.addEventListener('fetch', (event) => {
           if (cachedResponse) {
             return cachedResponse;
           }
-          // Cache'de de yoksa ve HTML ise index.html'i göster
+          // Cache'de de yoksa ve HTML ise index.php'yi göster
           if (event.request.destination === 'document' || event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('./index.html');
+            return caches.match('./index.php').then(fallback => {
+              if (fallback) return fallback;
+              // Bazı sunucular root'tan (./) index.php döndürür
+              return caches.match('./');
+            });
           }
           // Diğer durumlarda hata döndür
           return new Response('Offline', { 

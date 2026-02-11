@@ -1,15 +1,24 @@
 <?php
 declare(strict_types=1);
 
-const COUNTER_COOKIE_NAME     = 'unique_visit_1h';
-const COUNTER_COOKIE_LIFETIME = 3600; // 1 saat (saniye cinsinden)
+const COUNTER_COOKIE_NAME         = 'unique_visit_1h';
+const COUNTER_COOKIE_TESBIHAT     = 'unique_visit_tesbihat_1h';
+const COUNTER_COOKIE_LIFETIME     = 3600; // 1 saat (saniye cinsinden)
 
 /**
- * Sayaç dosyasının tam yolu.
+ * Ana sayfa sayaç dosyasının tam yolu.
  */
 function getCounterFilePath(): string
 {
     return __DIR__ . '/storage/count.txt';
+}
+
+/**
+ * Tesbihat sayfası sayaç dosyasının tam yolu.
+ */
+function getTesbihatCounterFilePath(): string
+{
+    return __DIR__ . '/storage/count-tesbihat.txt';
 }
 
 /**
@@ -73,6 +82,61 @@ function getTotalVisitCount(): int
     }
 
     // Kilidi bırak ve dosyayı kapat
+    flock($fp, LOCK_UN);
+    fclose($fp);
+
+    return $current;
+}
+
+/**
+ * Tesbihat sayfası ziyaretçisini 1 saat içinde sadece 1 kez sayar.
+ */
+function getTesbihatVisitCount(): int
+{
+    $counterFile = getTesbihatCounterFilePath();
+
+    if (!file_exists($counterFile)) {
+        file_put_contents($counterFile, "0\n", LOCK_EX);
+    }
+
+    $fp = fopen($counterFile, 'c+');
+    if ($fp === false) {
+        throw new RuntimeException('Tesbihat sayaç dosyası açılamadı.');
+    }
+
+    if (!flock($fp, LOCK_EX)) {
+        fclose($fp);
+        throw new RuntimeException('Tesbihat sayaç dosyası kilitlenemedi.');
+    }
+
+    $contents = stream_get_contents($fp);
+    $current  = is_numeric(trim((string)$contents)) ? (int)trim((string)$contents) : 0;
+
+    $hasRecentVisit = isset($_COOKIE[COUNTER_COOKIE_TESBIHAT]);
+
+    if (!$hasRecentVisit) {
+        $current++;
+
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, (string)$current);
+        fflush($fp);
+
+        $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+
+        setcookie(
+            COUNTER_COOKIE_TESBIHAT,
+            '1',
+            [
+                'expires'  => time() + COUNTER_COOKIE_LIFETIME,
+                'path'     => '/',
+                'secure'   => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]
+        );
+    }
+
     flock($fp, LOCK_UN);
     fclose($fp);
 

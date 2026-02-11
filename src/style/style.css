@@ -654,22 +654,19 @@ body.dark-mode {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .footer {
-    position: relative;
     text-align: center;
-    margin-top: 20px;
-}
-
-.footer-text {
+    margin-top: 24px;
     font-family: 'Playwrite DE Grund', 'Arial', sans-serif;
     font-size: 0.85rem;
     color: #777;
-    font-weight: 400;
-    direction: rtl;
+}
+
+.footer-count-wrap {
     margin: 0;
 }
 
@@ -681,11 +678,15 @@ body.dark-mode {
 }
 
 .footer-powered {
-    position: absolute;
-    right: 16px;
-    bottom: 0;
-    font-size: 0.8rem;
+    display: block;
+    margin-top: 12px;
+    padding-right: 0;
+    font-size: 0.75rem;
     direction: ltr;
+    text-align: right;
+    white-space: nowrap;
+    font-family: 'Playwrite DE Grund', 'Arial', sans-serif;
+    color: #777;
 }
 
 .footer-visit-count {
@@ -752,6 +753,10 @@ body.dark-mode .footer-brand {
     color: #ff6b6b;
 }
 
+body.dark-mode .footer-powered {
+    color: #888;
+}
+
 @media (max-width: 768px) {
 
 
@@ -764,8 +769,8 @@ body.dark-mode .footer-brand {
     display: flex;
     align-items: center;
     gap: 25px;
-    margin-bottom: 40px;
-    padding: 30px 0;
+
+    padding: 30px 0 10px 0;
     direction: ltr;
 }
 
@@ -795,6 +800,22 @@ body.dark-mode .footer-brand {
 
 .buttons-wrapper {
     margin-bottom: 30px;
+}
+
+/* Tesbihat: masaüstünde yan yana, mobilde 2x3 grid - soldan sağa sıra */
+.tesbihat-nav-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    direction: ltr;
+}
+.tesbihat-nav-grid .tab-button {
+    margin: 0;
+}
+.tesbihat-mode-btn {
+    font-size: 0.95rem !important;
+    padding: 12px 16px !important;
 }
 
 .button-group {
@@ -846,6 +867,13 @@ body.dark-mode .tab-button {
     min-width: 0;
 }
 
+.controls .control-button,
+.controls .help-button,
+.controls .control-help-btn,
+.controls .control-button-home {
+    min-height: 48px;
+}
+
 .control-button {
     padding: 12px 30px;
     font-size: 1rem;
@@ -878,6 +906,38 @@ body.dark-mode .control-button.active {
 .control-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(212, 33, 33, 0.3);
+}
+
+.control-button-home {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    min-width: 44px;
+}
+
+.control-button-home img {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.controls .control-button i {
+    font-size: 1.4rem;
+}
+
+/* Tam ekran butonu: kare görünüm, belirgin dış border */
+.control-button-square {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 2px solid var(--primary-red);
 }
 
 /* Yardım butonu satırda (Tercüme + Koyu Mod ile aynı yükseklik) */
@@ -1017,6 +1077,9 @@ body.focus-mode .zikir-besmele .zikir-pronunciation,
 body.focus-mode .zikir-besmele .zikir-translation,
 body.focus-mode .zikir-hamd .zikir-pronunciation,
 body.focus-mode .zikir-hamd .zikir-translation {
+    display: none !important;
+}
+body.focus-mode .tesbihat-note {
     display: none !important;
 }
 
@@ -1173,6 +1236,56 @@ h2 {
     flex-direction: column;
     align-items: center;
     gap: 2px;
+}
+
+/* Tesbihat: kişisel dua notu (bilgi kutusu) */
+.tesbihat-note {
+    background: linear-gradient(135deg, rgba(212, 33, 33, 0.08) 0%, rgba(212, 33, 33, 0.03) 100%) !important;
+    border-right: 4px solid var(--primary-red);
+}
+.tesbihat-note .tesbihat-note-icon {
+    color: var(--primary-red);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+.tesbihat-note .zikir-translation {
+    display: block !important;
+}
+.tesbihat-note .zikir-translation .zikir-block-content {
+    font-style: italic;
+    color: #555;
+}
+body.dark-mode .tesbihat-note {
+    background: linear-gradient(135deg, rgba(212, 33, 33, 0.15) 0%, rgba(212, 33, 33, 0.05) 100%) !important;
+}
+body.dark-mode .tesbihat-note .zikir-translation .zikir-block-content {
+    color: #bbb;
+}
+
+/* Tesbihat: zikirmatik sağda, kaç defa okunacağı karşısında (solda) */
+.tesbihat-tags {
+    justify-content: space-between;
+}
+.tesbihat-tags .zikir-count {
+    font-size: 0.85rem;
+}
+
+/* Tesbihat: tüm zikirmatikler büyük */
+#tesbihat-content .zikirmatik-wrap .zikirmatik {
+    width: 54px;
+    height: 54px;
+}
+#tesbihat-content .zikirmatik-wrap .zikirmatik-center {
+    font-size: 0.75rem;
+}
+
+/* Tesbihat: 33 defa okunan zikirlerde zikirmatik daha da büyük */
+.zikirmatik-wrap-large .zikirmatik {
+    width: 62px;
+    height: 62px;
+}
+.zikirmatik-wrap-large .zikirmatik-center {
+    font-size: 0.85rem;
 }
 
 .zikirmatik-label {
@@ -1863,6 +1976,30 @@ body.dark-mode .linear-progress {
         gap: 15px;
         margin-bottom: 30px;
     }
+    .buttons-wrapper.tesbihat-nav-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto auto;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .tesbihat-mode-btn {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .tesbihat-nav-grid .tesbihat-tabs[data-vakit="sabah"] { grid-column: 2; grid-row: 1; }
+    .tesbihat-nav-grid .tesbihat-tabs[data-vakit="ogle"] { grid-column: 3; grid-row: 1; }
+    .tesbihat-nav-grid .tesbihat-tabs[data-vakit="ikindi"] { grid-column: 1; grid-row: 2; }
+    .tesbihat-nav-grid .tesbihat-tabs[data-vakit="aksam"] { grid-column: 2; grid-row: 2; }
+    .tesbihat-nav-grid .tesbihat-tabs[data-vakit="yatsi"] { grid-column: 3; grid-row: 2; }
+    .tesbihat-nav-grid .tab-button {
+        min-height: 75px;
+        height: 75px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
     .button-group {
         display: flex;
@@ -2079,17 +2216,29 @@ body.dark-mode .linear-progress {
         padding: 12px 20px;
     }
 
+    .controls .control-button,
+    .controls .control-button-home,
+    .controls .help-button,
+    .controls .control-help-btn {
+        min-height: 44px;
+    }
+
     .controls .control-button {
-        min-height: 40px;
         padding: 8px 10px;
+    }
+
+    .controls .control-button-home img {
+        width: 32px;
+        height: 32px;
     }
 
     .toast {
         min-width: 250px;
         padding: 12px 16px;
     }
-    #focusModeBtn{
-        width: 40px;
-        height: 40px;
+    #focusModeBtn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0 12px;
     }
 }

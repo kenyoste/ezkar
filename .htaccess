@@ -4,6 +4,10 @@
 # Enable Rewrite Engine
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /ezkar/
+
+    # Eski tesbihat linki yönlendirmesi
+    RewriteRule ^namaz-tesbihat\.html$ namaz-tesbihat.php [L,R=301]
     
     # HTTPS Zorunluluğu
     RewriteCond %{HTTPS} off

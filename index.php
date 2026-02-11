@@ -306,9 +306,12 @@ $totalVisits = getTotalVisitCount();
                     <button class="help-button control-help-btn" onclick="showHelpModal()" aria-label="Yardım">
                         <i class="fas fa-question-circle"></i>
                     </button>
-                    <button class="control-button" onclick="toggleFocusMode()" id="focusModeBtn" aria-label="Derin odak modu (tam ekran)" title="Derin odak modu">
+                    <button class="control-button control-button-square" onclick="toggleFocusMode()" id="focusModeBtn" aria-label="Derin odak modu (tam ekran)" title="Derin odak modu">
                         <i class="fas fa-expand" aria-hidden="true"></i>
                     </button>
+                    <a href="namaz-tesbihat.php" class="control-button control-button-home" aria-label="Namaz Tesbihatı" title="Namaz Tesbihatı">
+                        <img src="src/img/android/ikon-tesbihat.webp" alt="" width="24" height="24" aria-hidden="true">
+                    </a>
                     <button class="control-button" onclick="toggleDarkMode()" id="darkModeBtn" aria-pressed="false">
                         Koyu Mod   
                        </button>
@@ -320,26 +323,26 @@ $totalVisits = getTotalVisitCount();
 
         <section id="sabah-content" class="zikir-content active" aria-label="Sabah Zikirleri"></section>
         <section id="aksam-content" class="zikir-content" aria-label="Akşam Zikirleri"></section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-text">
-            <span class="footer-powered">
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-count-wrap">
+                <a href="namaz-tesbihat.php" class="footer-link-tesbihat" style="display:block; margin-bottom:8px; color: var(--primary-red); text-decoration: none; font-weight: 600;">Namaz Tesbihatı →</a>
+                <span class="footer-count-row">
+                    Toplam okuma:
+                    <strong class="footer-visit-count">
+                        <span
+                            id="visitCount"
+                            data-target="<?php echo htmlspecialchars((string)$totalVisits, ENT_QUOTES, 'UTF-8'); ?>"
+                        >0</span>
+                    </strong>
+                </span>
+            </div>
+            <div class="footer-powered">
                 POWERED by <span class="footer-brand">kenyoste</span>
-            </span>
-            <br>
-            <span class="footer-count-row">
-                Toplam okuma:
-                <strong class="footer-visit-count">
-                    <span
-                        id="visitCount"
-                        data-target="<?php echo htmlspecialchars((string)$totalVisits, ENT_QUOTES, 'UTF-8'); ?>"
-                    >0</span>
-                </strong>
-            </span>
-        </p>
-    </footer>
+            </div>
+        </footer>
+    </main>
 
     <!-- Scroll Progress Indicators -->
     <div class="scroll-progress-container">
