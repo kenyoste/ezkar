@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /ezkar/storage/
+Disallow: /ezkar/counter.php
 
 # Sitemap
 Sitemap: https://kenyoste.com/ezkar/sitemap.xml

@@ -114,6 +114,5 @@ FileETag None
 # Prevent directory browsing
 Options -Indexes
 
-# Custom Error Pages (opsiyonel)
-# ErrorDocument 404 /404.html
-# ErrorDocument 500 /500.html
+# Custom Error Pages (sadece /ezkar/ altındaki 404'ler için)
+ErrorDocument 404 /ezkar/404.html

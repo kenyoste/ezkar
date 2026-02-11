@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#d42121">
+    <meta name="robots" content="noindex, follow">
+    <title>404 - Sayfa Bulunamadı | kenyoste</title>
+    <link rel="icon" type="image/png" href="src/img/ios/16.png">
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fdf5e6;
+            --red: #d42121;
+            --text: #333;
+            --muted: #666;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Readex Pro', -apple-system, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: var(--text);
+        }
+        .main-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .wrap { max-width: 420px; }
+        .error-img {
+            display: block;
+            margin: 0 auto 16px;
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+            animation: float-subtle 2s ease-in-out infinite;
+        }
+        @keyframes float-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--muted);
+            margin-bottom: 28px;
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background: var(--red);
+            color: white;
+            border: 2px solid var(--red);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 33, 33, 0.35);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--red);
+            border: 2px solid var(--red);
+        }
+        .btn-secondary:hover {
+            background: rgba(212, 33, 33, 0.08);
+            transform: translateY(-2px);
+        }
+        .wink {
+            font-size: 2rem;
+            margin-top: 16px;
+            opacity: 0.8;
+        }
+        .footnote {
+            padding: 24px 16px;
+            font-size: 0.8rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-area">
+    <div class="wrap">
+        <img src="src/img/404.webp" alt="404" class="error-img" width="320" height="320" loading="eager">
+        <h1 class="title">Sayfa burada değilmiş</h1>
+        <p class="text">
+            Aradığın sayfa ya hiç var olmadı, ya taşındı ya da şu an bir yerlerde kahvesini yudumlayıp seni bulmanı bekliyor. Belki zikir yapıyordur da, belli olmaz.   Endişelenme — kontrol hala bizde. (En azından öyle umuyoruz.)
+        </p>
+        <p class="text" style="margin-bottom: 24px; font-size: 0.95rem;">
+           Önemli olan sen buradasın ve aşağıdaki butonlar çalışıyor. Ona söz veriyoruz.
+        </p>
+        <div class="links">
+            <a href="/ezkar/" class="btn btn-primary">Zikirlere git</a>
+            <a href="/ezkar/namaz-tesbihat.php" class="btn btn-secondary">Namaz Tesbihatı</a>
+            <a href="https://kenyoste.com/" class="btn btn-secondary">Ana sayfa</a>
+        </div>
+    </div>
+    </div>
+    <p class="footnote"><em>Teknik not: 404 hatası, sunucuya ulaşıldığını ama istenen kaynağın bulunamadığını söyler.</em></p>
+</body>
+</html>

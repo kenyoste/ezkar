@@ -129,11 +129,6 @@ $totalVisits = getTotalVisitCount();
         "price": "0",
         "priceCurrency": "TRY"
       },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5",
-        "ratingCount": "1"
-      },
       "featureList": [
         "Sahih hadis kaynaklı sabah zikirleri",
         "Sahih hadis kaynaklı akşam zikirleri",
@@ -267,6 +262,11 @@ $totalVisits = getTotalVisitCount();
     </div>
     
     <main id="main-content" class="container">
+        <nav class="breadcrumb" aria-label="Konum">
+            <a href="https://kenyoste.com/">Ana Sayfa</a>
+            <span class="breadcrumb-sep" aria-hidden="true">›</span>
+            <span class="breadcrumb-current">Sabah-Akşam Zikirleri</span>
+        </nav>
         <header class="header">
             <div class="header-logo">
                 <picture>
@@ -301,8 +301,6 @@ $totalVisits = getTotalVisitCount();
         </nav>
 
                 <div class="controls">
-                 
-                  
                     <button class="help-button control-help-btn" onclick="showHelpModal()" aria-label="Yardım">
                         <i class="fas fa-question-circle"></i>
                     </button>
@@ -312,13 +310,8 @@ $totalVisits = getTotalVisitCount();
                     <a href="namaz-tesbihat.php" class="control-button control-button-home" aria-label="Namaz Tesbihatı" title="Namaz Tesbihatı">
                         <img src="src/img/android/ikon-tesbihat.webp" alt="" width="24" height="24" aria-hidden="true">
                     </a>
-                    <button class="control-button" onclick="toggleDarkMode()" id="darkModeBtn" aria-pressed="false">
-                        Koyu Mod   
-                       </button>
-                       <button class="control-button" onclick="toggleTranslation()" id="translationBtn" aria-pressed="false">
-                        Tercümeyi Göster 
-                     </button>
-                   
+                    <button class="control-button control-button-square" onclick="toggleDarkMode()" id="darkModeBtn" aria-pressed="false" aria-label="Koyu mod" title="Koyu mod"><span class="icon-swap"><i class="fas fa-moon" aria-hidden="true"></i><i class="fas fa-sun" aria-hidden="true"></i></span></button>
+                    <button class="control-button control-button-square control-button-translate" onclick="toggleTranslation()" id="translationBtn" aria-pressed="false" aria-label="Tercümeyi göster" title="Tercümeyi göster"><span class="icon-swap"><img src="src/img/android/ikon-translate-ar.webp" class="translate-icon" alt="" aria-hidden="true"><img src="src/img/android/ikon-translate-tr.webp" class="translate-icon" alt="" aria-hidden="true"></span></button>
                 </div>
 
         <section id="sabah-content" class="zikir-content active" aria-label="Sabah Zikirleri"></section>
@@ -327,7 +320,6 @@ $totalVisits = getTotalVisitCount();
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-count-wrap">
-                <a href="namaz-tesbihat.php" class="footer-link-tesbihat" style="display:block; margin-bottom:8px; color: var(--primary-red); text-decoration: none; font-weight: 600;">Namaz Tesbihatı →</a>
                 <span class="footer-count-row">
                     Toplam okuma:
                     <strong class="footer-visit-count">

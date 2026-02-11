@@ -1,12 +1,15 @@
-const CACHE_NAME = '1.000.000.11';
+const CACHE_NAME = '1.000.000.12';
 const urlsToCache = [
   './',
   './index.php',
+  './namaz-tesbihat.php',
   './manifest.json',
   './logo.webp',
   './logo.png',
   './üstlogo.webp',
   './üstlogo.png',
+  './src/img/android/ikon-tesbihat.webp',
+  './src/img/android/ikon-zikir.webp',
   './src/fonts/Loubag-Black.ttf',
   './src/fonts/Loubag-Light.ttf',
   './src/img/android/android-launchericon-512-512.png',
@@ -31,7 +34,6 @@ const urlsToCache = [
   './src/js/dualar.js',
   './src/js/script.js',
   './src/js/tesbihat.js',
-  './namaz-tesbihat.php',
   './src/style/style.css'
 ];
 
@@ -100,9 +102,9 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // script.js, style.css, dualar.js: HTTP cache bypass – güncelleme sonrası hep güncel sürüm gelsin
+  // script.js, style.css, dualar.js, tesbihat.js: HTTP cache bypass – güncelleme sonrası hep güncel sürüm gelsin
   const path = url.pathname;
-  if (path.includes('script.js') || path.includes('style.css') || path.includes('dualar.js')) {
+  if (path.includes('script.js') || path.includes('style.css') || path.includes('dualar.js') || path.includes('tesbihat.js')) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then((response) => {

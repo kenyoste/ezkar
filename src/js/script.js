@@ -351,14 +351,10 @@ function toggleTranslation() {
     const pronunciations = document.querySelectorAll('.zikir-pronunciation');
     
     btn.setAttribute('aria-pressed', showTranslation.toString());
-    
-    if (showTranslation) {
-        btn.innerHTML = ' Tercümeyi Gizle';
-        btn.classList.add('active');
-    } else {
-        btn.innerHTML = 'Tercümeyi Göster';
-        btn.classList.remove('active');
-    }
+    btn.setAttribute('aria-label', showTranslation ? 'Tercümeyi gizle' : 'Tercümeyi göster');
+    btn.setAttribute('title', showTranslation ? 'Tercümeyi gizle' : 'Tercümeyi göster');
+    const wrap = btn.querySelector('.icon-swap');
+    if (wrap) wrap.classList.toggle('state-tr', showTranslation);
     
     translations.forEach(trans => {
         if (showTranslation) {
@@ -382,18 +378,19 @@ function toggleTranslation() {
 function toggleDarkMode() {
     darkMode = !darkMode;
     const btn = document.getElementById('darkModeBtn');
-    
+    if (!btn) return;
     btn.setAttribute('aria-pressed', darkMode.toString());
-    
+    btn.setAttribute('aria-label', darkMode ? 'Açık mod' : 'Koyu mod');
+    btn.setAttribute('title', darkMode ? 'Açık mod' : 'Koyu mod');
+    const wrap = btn.querySelector('.icon-swap');
+    if (wrap) wrap.classList.toggle('state-dark', darkMode);
     if (darkMode) {
         document.body.classList.add('dark-mode');
-        btn.innerHTML = ' Açık Mod';
-        btn.classList.add('active');
+        try { localStorage.setItem('darkMode', 'true'); } catch (e) {}
         announceToScreenReader('Koyu mod etkinleştirildi');
     } else {
         document.body.classList.remove('dark-mode');
-        btn.innerHTML = 'Koyu Mod';
-        btn.classList.remove('active');
+        try { localStorage.setItem('darkMode', 'false'); } catch (e) {}
         announceToScreenReader('Açık mod etkinleştirildi');
     }
 }
@@ -971,6 +968,19 @@ window.addEventListener('load', () => {
 
 // Sayfa yüklendiğinde sabah zikirlerini göster
 document.addEventListener('DOMContentLoaded', () => {
+    // Kayıtlı koyu modu uygula
+    if (localStorage.getItem('darkMode') === 'true') {
+        darkMode = true;
+        document.body.classList.add('dark-mode');
+        const dmBtn = document.getElementById('darkModeBtn');
+        if (dmBtn) {
+            dmBtn.setAttribute('aria-pressed', 'true');
+            dmBtn.setAttribute('aria-label', 'Açık mod');
+            dmBtn.setAttribute('title', 'Açık mod');
+            const wrap = dmBtn.querySelector('.icon-swap');
+            if (wrap) wrap.classList.add('state-dark');
+        }
+    }
     // Kayıtlı Arapça yazı tipi seçimini uygula
     initArabicFontChoice();
     // Paylaş linklerini güncelle

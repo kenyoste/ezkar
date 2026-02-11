@@ -66,6 +66,17 @@ $tesbihatVisits = getTesbihatVisitCount();
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://kenyoste.com/"},
+        {"@type": "ListItem", "position": 2, "name": "Sabah-Akşam Zikirleri", "item": "https://kenyoste.com/ezkar/"},
+        {"@type": "ListItem", "position": 3, "name": "Namaz Tesbihatı", "item": "https://kenyoste.com/ezkar/namaz-tesbihat.php"}
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
       "@type": "WebPage",
       "name": "Namaz Tesbihatı",
       "description": "Namaz sonrası tesbihat. Beş vakit namazın ardından okunacak dualar, sübhanallah, elhamdulillah, allahu ekber zikirleri, salavat ve istiğfar.",
@@ -93,11 +104,19 @@ $tesbihatVisits = getTesbihatVisitCount();
     <link rel="icon" type="image/png" href="src/img/android/android-launchericon-192-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+Grund:wght@100..400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400..700&family=Vazirmatn:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&family=Almarai:wght@300;400;700;800&family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400..700&family=Noto+Sans+Arabic:wght@100..900&family=Reem+Kufi+Fun:wght@400..700&family=Reem+Kufi+Ink&family=Rubik:ital,wght@0,300..900;1,300..900&family=Ruwudu:wght@400;500;600;700&family=Tajawal:wght@200;300;400;500;700;800;900&family=Readex+Pro:wght@160..700&family=Vazirmatn:wght@100..900&display=swap">
 </head>
 <body>
     <main id="main-content" class="container">
+        <nav class="breadcrumb" aria-label="Konum">
+            <a href="https://kenyoste.com/">Ana Sayfa</a>
+            <span class="breadcrumb-sep" aria-hidden="true">›</span>
+            <a href="index.php">Sabah-Akşam Zikirleri</a>
+            <span class="breadcrumb-sep" aria-hidden="true">›</span>
+            <span class="breadcrumb-current" id="breadcrumbCurrent">Uzun Namaz Tesbihatı</span>
+        </nav>
         <header class="header">
             <div class="header-logo">
                 <picture>
@@ -105,7 +124,7 @@ $tesbihatVisits = getTesbihatVisitCount();
                     <img src="üstlogo.png" alt="Namaz Tesbihatı" width="190" height="150" fetchpriority="high">
                 </picture>
             </div>
-            <h1>Namaz Tesbihatı</h1>
+            <h1 id="tesbihatHeaderTitle">Namaz Tesbihatı</h1>
     
         </header>
 
@@ -124,11 +143,11 @@ $tesbihatVisits = getTesbihatVisitCount();
             <button type="button" class="control-button control-button-square" onclick="toggleFocusMode()" id="focusModeBtn" aria-label="Derin odak modu (tam ekran)" title="Tam ekran" aria-pressed="false">
                 <i class="fas fa-expand" aria-hidden="true"></i>
             </button>
-            <button type="button" class="control-button" id="translationBtn" aria-pressed="false">Tercümeyi Göster</button>
             <a href="index.php" class="control-button control-button-home" aria-label="Ana ekrana dön" title="Ana ekrana dön">
-                <img src="src/img/android/ikon-zikir.webp" alt="Ezkar sayfasına yönlendiren proje logosu"  aria-hidden="true">
+                <img src="src/img/android/ikon-zikir.webp" alt="Ezkar sayfasına yönlendiren proje logosu" aria-hidden="true">
             </a>
-            <button type="button" class="control-button" onclick="toggleDarkMode()" id="darkModeBtn" aria-pressed="false">Koyu Mod</button>
+            <button type="button" class="control-button control-button-square" onclick="toggleDarkMode()" id="darkModeBtn" aria-pressed="false" aria-label="Koyu mod" title="Koyu mod"><span class="icon-swap"><i class="fas fa-moon" aria-hidden="true"></i><i class="fas fa-sun" aria-hidden="true"></i></span></button>
+            <button type="button" class="control-button control-button-square control-button-translate" id="translationBtn" aria-pressed="false" aria-label="Tercümeyi göster" title="Tercümeyi göster"><span class="icon-swap"><img src="src/img/android/ikon-translate-ar.webp" class="translate-icon" alt="" aria-hidden="true"><img src="src/img/android/ikon-translate-tr.webp" class="translate-icon" alt="" aria-hidden="true"></span></button>
         </div>
 
         <section id="tesbihat-content" class="zikir-content active" aria-label="Tesbihat içeriği"></section>
@@ -136,7 +155,7 @@ $tesbihatVisits = getTesbihatVisitCount();
 
     <footer class="footer">
         <div class="footer-count-wrap">
-            <span class="footer-count-row" style="display: block; margin-top: 8px;">
+            <span class="footer-count-row">
                 Toplam okuma: <strong class="footer-visit-count"><span id="visitCount" data-target="<?php echo (int)$tesbihatVisits; ?>"><?php echo (int)$tesbihatVisits; ?></span></strong>
             </span>
         </div>
@@ -184,8 +203,12 @@ $tesbihatVisits = getTesbihatVisitCount();
             darkMode = !darkMode;
             document.body.classList.toggle('dark-mode', darkMode);
             const btn = document.getElementById('darkModeBtn');
+            if (!btn) return;
             btn.setAttribute('aria-pressed', darkMode);
-            btn.textContent = darkMode ? 'Açık Mod' : 'Koyu Mod';
+            btn.setAttribute('aria-label', darkMode ? 'Açık mod' : 'Koyu mod');
+            btn.setAttribute('title', darkMode ? 'Açık mod' : 'Koyu mod');
+            var wrap = btn.querySelector('.icon-swap');
+            if (wrap) wrap.classList.toggle('state-dark', darkMode);
             try { localStorage.setItem('darkMode', darkMode); } catch (e) {}
         }
         window.toggleDarkMode = toggleDarkMode;
@@ -269,11 +292,12 @@ $tesbihatVisits = getTesbihatVisitCount();
             const list = getTesbihatList(vakit);
             if (!list) return;
 
+            const firstZikirmatikIndex = list.findIndex(function(z) { return !z.note; });
             const content = document.getElementById('tesbihat-content');
             content.innerHTML = list.map(function(zikir, index) {
                 if (zikir.note) {
                     return '<article class="zikir-item tesbihat-note" data-zikir-id="tesbihat-' + vakit + '-' + index + '">' +
-                        '<div class="tesbihat-note-icon"><i class="fas fa-hands-praying"></i></div>' +
+                        '<div class="tesbihat-note-icon"><i class="fas fa-info-circle"></i></div>' +
                         '<h2 class="zikir-title">' + escapeHtml(zikir.title) + '</h2>' +
                         '<div class="zikir-translation ltr-block tesbihat-note-text"><div class="zikir-block-content">' + escapeHtml(zikir.translation || '') + '</div></div>' +
                         '</article>';
@@ -286,11 +310,12 @@ $tesbihatVisits = getTesbihatVisitCount();
                 const ringOffset = (2 * Math.PI * 15) * (1 - progress);
 
                 const largeClass = targetCount === 33 ? ' zikirmatik-wrap-large' : '';
+                const labelHtml = (index === firstZikirmatikIndex) ? '<span class="zikirmatik-label">zikirmatik</span>' : '';
                 const zikirmatikHtml = '<span class="zikirmatik-wrap' + largeClass + '" title="Tıkla: zikir sayacı">' +
                     '<button type="button" class="zikirmatik ' + (hasTick ? 'zikirmatik-done' : '') + '" data-zikir-id="' + zikirId + '" data-target="' + targetCount + '" onclick="incrementTesbihatZikir(this)" aria-label="Zikir sayacı: ' + currentCount + ' / ' + targetCount + '">' +
                     '<span class="zikirmatik-ring"><svg viewBox="0 0 36 36"><circle class="zikirmatik-ring-bg" cx="18" cy="18" r="15" fill="none" stroke-width="2.5"/><circle class="zikirmatik-ring-fill ' + (hasTick ? 'complete' : '') + '" cx="18" cy="18" r="15" fill="none" stroke-width="2.5" stroke-dasharray="94.25" stroke-dashoffset="' + ringOffset + '" transform="rotate(-90 18 18)"/></svg></span>' +
                     '<span class="zikirmatik-center"><span class="zikirmatik-num">' + currentCount + '</span><span class="zikirmatik-sep">/</span><span class="zikirmatik-target">' + targetCount + '</span><span class="zikirmatik-tick ' + (hasTick ? '' : 'hidden') + '"><i class="fas fa-check"></i></span></span></button>' +
-                    '<span class="zikirmatik-label">zikirmatik</span></span>';
+                    labelHtml + '</span>';
 
                 return '<article class="zikir-item" data-zikir-id="' + zikirId + '">' +
                     '<div class="zikir-arabic" dir="rtl" lang="ar">' + zikir.arabic + '</div>' +
@@ -311,8 +336,10 @@ $tesbihatVisits = getTesbihatVisitCount();
         document.getElementById('translationBtn').addEventListener('click', function() {
             showTranslation = !showTranslation;
             this.setAttribute('aria-pressed', showTranslation);
-            this.textContent = showTranslation ? 'Tercümeyi Gizle' : 'Tercümeyi Göster';
-            this.classList.toggle('active', showTranslation);
+            this.setAttribute('aria-label', showTranslation ? 'Tercümeyi gizle' : 'Tercümeyi göster');
+            this.setAttribute('title', showTranslation ? 'Tercümeyi gizle' : 'Tercümeyi göster');
+            var wrap = this.querySelector('.icon-swap');
+            if (wrap) wrap.classList.toggle('state-tr', showTranslation);
             document.querySelectorAll('#tesbihat-content .zikir-translation:not(.tesbihat-note-text)').forEach(function(el) {
                 el.classList.toggle('hidden', !showTranslation);
             });
@@ -330,11 +357,21 @@ $tesbihatVisits = getTesbihatVisitCount();
             });
         });
 
+        function updateTesbihatHeaderTitle() {
+            var title = tesbihatMode === 'uzun' ? 'Uzun Namaz Tesbihatı' : 'Kısa Namaz Tesbihatı';
+            var h1 = document.getElementById('tesbihatHeaderTitle');
+            var bc = document.getElementById('breadcrumbCurrent');
+            if (h1) h1.textContent = title;
+            if (bc) bc.textContent = title;
+        }
+        updateTesbihatHeaderTitle();
+
         document.getElementById('tesbihatModeBtn').addEventListener('click', function() {
             tesbihatMode = tesbihatMode === 'uzun' ? 'kisa' : 'uzun';
             this.textContent = tesbihatMode === 'uzun' ? 'Kısa Tesbihat' : 'Uzun Tesbihat';
             this.setAttribute('aria-pressed', tesbihatMode === 'kisa');
             this.classList.toggle('active', tesbihatMode === 'kisa');
+            updateTesbihatHeaderTitle();
             var activeVakit = document.querySelector('.tesbihat-tabs[data-vakit].active');
             renderTesbihat(activeVakit ? activeVakit.getAttribute('data-vakit') : 'sabah');
         });
@@ -342,9 +379,24 @@ $tesbihatVisits = getTesbihatVisitCount();
         if (localStorage.getItem('darkMode') === 'true') {
             darkMode = true;
             document.body.classList.add('dark-mode');
-            document.getElementById('darkModeBtn').setAttribute('aria-pressed', 'true');
-            document.getElementById('darkModeBtn').textContent = 'Açık Mod';
+            var dmBtn = document.getElementById('darkModeBtn');
+            if (dmBtn) {
+                dmBtn.setAttribute('aria-pressed', 'true');
+                dmBtn.setAttribute('aria-label', 'Açık mod');
+                dmBtn.setAttribute('title', 'Açık mod');
+                var wrap = dmBtn.querySelector('.icon-swap');
+                if (wrap) wrap.classList.add('state-dark');
+            }
         }
+
+        (function initTesbihatArabicFont() {
+            var saved = null;
+            try { saved = localStorage.getItem('arabicFont'); } catch (e) {}
+            if (saved) {
+                var value = "'" + saved + "', serif";
+                document.documentElement.style.setProperty('--font-arabic', value);
+            }
+        })();
 
         function updateScrollProgress() {
             var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
